@@ -1,0 +1,13 @@
+package rs.ftn.RedditCopyCat;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class RedditCopyCatApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(RedditCopyCatApplication.class, args);
+	}
+
+}
