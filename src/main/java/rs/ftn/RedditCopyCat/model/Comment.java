@@ -34,5 +34,5 @@ public class Comment {
 
 //    TODO hoce li cascadeAll ovde praviti problem (ko je parent a ko child/reply)?
     @OneToMany(mappedBy = "repliesTo", cascade = CascadeType.ALL)
-    private Comment repliesToComment;
+    private Comment repliesTo;
 }

@@ -41,6 +41,7 @@ public class Community {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Flair> flairs = new HashSet<Flair>();
 
-    @OneToMany(mappedBy = "community", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    TODO EAGER ili LAZY ?
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Post> posts = new HashSet<Post>();
 }

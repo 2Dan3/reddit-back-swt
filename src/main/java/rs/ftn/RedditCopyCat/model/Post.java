@@ -29,7 +29,8 @@ public class Post {
     @Column
     private String imagePath;
 
-//    TODO treba li cascadeAll?
+//    TODO treba li "cascadeAll"?
+//    TODO treba li "EAGER" uopste?
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "flair_id")
     private Flair flair;
@@ -37,4 +38,9 @@ public class Post {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User postedByUser;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "community_id")
+    private Community community;
+
 }

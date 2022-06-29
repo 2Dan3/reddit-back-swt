@@ -1,10 +1,9 @@
 package rs.ftn.RedditCopyCat.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,8 +12,13 @@ import java.util.Set;
 @Table(name = "user")
 @Getter
 @Setter
+@ToString
+@AllArgsConstructor
 @NoArgsConstructor
-public class User {
+//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+//@DiscriminatorColumn(name = "user_role", discriminatorType = DiscriminatorType.STRING)
+//@DiscriminatorValue("USER")
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,7 +45,7 @@ public class User {
     @Column
     private String displayName;
 
-// TODO treba li orphanRemoval ovde ?
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+// TODO treba li orphanRemoval = true ovde ?
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Moderator> moderators = new HashSet<Moderator>();
 }
