@@ -52,5 +52,7 @@ public class User implements Serializable {
     private Set<Moderator> moderators = new HashSet<Moderator>();
 
 //    @Transient
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Roles role;
 }
