@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
 import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.model.enums.Roles;
+import rs.ftn.RedditCopyCat.repository.UserRepository;
 import rs.ftn.RedditCopyCat.service.UserService;
 
 import java.util.List;
@@ -61,5 +62,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> findAll() {
         return this.userRepository.findAll();
+    }
+
+    public Optional<User> findById(Long id) {
+        return this.userRepository.findById(id);
     }
 }

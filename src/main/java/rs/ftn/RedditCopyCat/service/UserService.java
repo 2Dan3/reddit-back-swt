@@ -12,4 +12,7 @@ public interface UserService {
     User createUser(UserDTO userDTO);
 
     List<User> findAll();
+
+    User findById(Integer id);
+
 }
