@@ -1,7 +1,7 @@
 package rs.ftn.RedditCopyCat.model.DTO;
 
 import lombok.Data;
-import rs.ftn.RedditCopyCat.model.Community;
+import rs.ftn.RedditCopyCat.model.entity.Community;
 
 import java.time.LocalDate;
 

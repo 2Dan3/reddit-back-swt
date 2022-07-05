@@ -1,6 +1,8 @@
-package rs.ftn.RedditCopyCat.model;
+package rs.ftn.RedditCopyCat.model.entity;
 
 import lombok.*;
+import rs.ftn.RedditCopyCat.model.entity.Moderator;
+import rs.ftn.RedditCopyCat.model.enums.Roles;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -48,4 +50,7 @@ public class User implements Serializable {
 // TODO treba li orphanRemoval = true ovde ?
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Moderator> moderators = new HashSet<Moderator>();
+
+//    @Transient
+    private Roles role;
 }

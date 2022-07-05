@@ -1,4 +1,4 @@
-package rs.ftn.RedditCopyCat.model;
+package rs.ftn.RedditCopyCat.model.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

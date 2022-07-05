@@ -1,8 +1,4 @@
-package rs.ftn.RedditCopyCat.model;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Transient;
+package rs.ftn.RedditCopyCat.model.entity;
 
 // TODO Class, pitati
 //@Entity
@@ -12,5 +8,5 @@ public class Administrator extends User {
 //    @Transient
 //    public String getRole() {
 //        return this.getClass().getAnnotation(DiscriminatorValue.class);
-    }
+//    }
 }

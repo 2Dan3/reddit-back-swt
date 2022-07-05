@@ -1,8 +1,9 @@
-package rs.ftn.RedditCopyCat.model;
+package rs.ftn.RedditCopyCat.model.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ftn.RedditCopyCat.model.entity.Community;
 
 import javax.persistence.*;
 import java.util.HashSet;
