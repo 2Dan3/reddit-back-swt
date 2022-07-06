@@ -17,10 +17,14 @@ public class Community {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "community_id", nullable = false)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Moderator moderator;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    private Moderator moderator;
+
+    @ManyToMany(mappedBy = "moderatedCommunities")
+    private Set<User> moderators;
 
     @Column(nullable = false)
     private String name;
@@ -37,7 +41,6 @@ public class Community {
     @Column
     private String suspensionReason;
 
-//    TODO parametrizovati manytomany annotation sa cascadeAll?
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Flair> flairs = new HashSet<Flair>();
 

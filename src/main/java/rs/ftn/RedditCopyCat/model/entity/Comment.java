@@ -15,6 +15,7 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id", nullable = false)
     private Long id;
 
     @Column
@@ -32,7 +33,8 @@ public class Comment {
     @ManyToOne(fetch = FetchType.EAGER)
     private User belongsToUser;
 
-//    TODO hoce li cascadeAll ovde praviti problem (ko je parent a ko child/reply)?
-    @OneToMany(mappedBy = "repliesTo", cascade = CascadeType.ALL)
-    private Comment repliesTo;
+//    TODO hoce li (u slucaju OneToMany) cascadeAll ovde praviti problem (ko je parent a ko child/reply)?
+//    @OneToMany(mappedBy = "repliesTo", cascade = CascadeType.ALL)
+    @ManyToOne()
+    private Comment parentComment;
 }

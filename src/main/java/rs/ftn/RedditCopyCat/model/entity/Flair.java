@@ -17,6 +17,7 @@ public class Flair {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "flair_id", nullable = false)
     private Long id;
 
     @Column

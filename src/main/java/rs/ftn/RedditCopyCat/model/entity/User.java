@@ -17,13 +17,14 @@ import java.util.Set;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-//@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-//@DiscriminatorColumn(name = "user_role", discriminatorType = DiscriminatorType.STRING)
-//@DiscriminatorValue("USER")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("USER")
 public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", nullable = false)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -48,11 +49,25 @@ public class User implements Serializable {
     private String displayName;
 
 // TODO treba li orphanRemoval = true ovde ?
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Moderator> moderators = new HashSet<Moderator>();
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private Set<Moderator> moderators = new HashSet<Moderator>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "moderator",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "community_id")
+    )
+    private Set<Community> moderatedCommunities;
 
 //    @Transient
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Roles role;
+
+//    TODO check JPA Persistence & in Administrator Class
+    @Transient
+    public String getRole(){
+        return this.getClass().getAnnotation(DiscriminatorValue.class).toString();
+    }
 }
