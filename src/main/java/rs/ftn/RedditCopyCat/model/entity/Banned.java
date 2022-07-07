@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class Banned {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "banned_id", nullable = false)
+    @Column(name = "ban_id", nullable = false)
     private Long id;
 
     @Column

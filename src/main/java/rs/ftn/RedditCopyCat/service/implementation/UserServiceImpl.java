@@ -15,13 +15,10 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private UserRepository userRepository;
 
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /*
     @Autowired
     public UserServiceImpl(UserRepository userRepository){
         this.userRepository = userRepository;
@@ -31,7 +28,7 @@ public class UserServiceImpl implements UserService {
     public void setPasswordEncoder(PasswordEncoder passwordEncoder){
         this.passwordEncoder = passwordEncoder;
     }
-*/
+
     @Override
     public User findByUsername(String username) {
         Optional<User> user = userRepository.findFirstByUsername(username);
@@ -64,7 +61,19 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.findAll();
     }
 
-    public Optional<User> findById(Long id) {
-        return this.userRepository.findById(id);
+    // TODO vraca li User, ili prvo ide preko UserDetails ?
+
+//    @Override
+//    public User findById(Long id) {
+//        userRepository.findById(id);
+//        return null;
+//    }
+
+    public User findById(Long id) {
+        return this.userRepository.findById(id).orElse(null);
+//        if (foundUser.isPresent()) {
+//            return foundUser.get();
+//        }
+//        return null;
     }
 }

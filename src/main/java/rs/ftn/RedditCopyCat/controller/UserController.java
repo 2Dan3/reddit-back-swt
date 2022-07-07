@@ -29,11 +29,8 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
-
     UserDetailsService userDetailsService;
-
     AuthenticationManager authenticationManager;
-
     TokenUtils tokenUtils;
 
     @Autowired
@@ -45,8 +42,8 @@ public class UserController {
         this.tokenUtils = tokenUtils;
     }
 
-    @PostMapping()
-    public ResponseEntity<UserDTO> registerNewUser(@RequestBody @Validated UserDTO newUser){
+    @PostMapping()                                          /*@Validated*/
+    public ResponseEntity<UserDTO> registerNewUser(@RequestBody  UserDTO newUser){
 
         User createdUser = userService.createUser(newUser);
 
@@ -95,12 +92,12 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public User user(@PathVariable Integer id) {
+    public ResponseEntity<UserDTO> user(@PathVariable Long id) {
         User foundUser = this.userService.findById(id);
 
-//        if (foundUser == null) {
-//            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-//        }
-        return foundUser;
+        if (foundUser == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<UserDTO>(new UserDTO(foundUser), HttpStatus.OK);
     }
 }

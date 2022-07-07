@@ -14,7 +14,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import rs.ac.uns.ftn.svtvezbe07.security.TokenUtils;
 
 public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
 

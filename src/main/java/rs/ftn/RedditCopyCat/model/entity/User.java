@@ -55,13 +55,13 @@ public class User implements Serializable {
     @ManyToMany
     @JoinTable(
             name = "moderator",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "community_id")
+            joinColumns = @JoinColumn(name = "u_id"),
+            inverseJoinColumns = @JoinColumn(name = "commu_id")
     )
-    private Set<Community> moderatedCommunities;
+    private Set<Community> moderatedCommunities  = new HashSet<Community>();
 
 //    @Transient
-    @Column(nullable = false)
+    @Column(nullable = false, insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private Roles role;
 
