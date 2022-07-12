@@ -21,6 +21,7 @@ import rs.ftn.RedditCopyCat.service.UserService;
 import rs.ftn.RedditCopyCat.service.implementation.UserServiceImpl;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.util.List;
 
@@ -92,12 +93,73 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> user(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
         User foundUser = this.userService.findById(id);
 
         if (foundUser == null) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<UserDTO>(new UserDTO(foundUser), HttpStatus.OK);
+    }
+
+    // TODO: PUT Password (Encoding)
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                 /*@NotBlank*/
+    public ResponseEntity<String> changeOwnPassword(@PathVariable Long id, @RequestBody String password) {
+        User subjectUser = this.userService.findById(id);
+
+        if (subjectUser == null)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        if (!userService.isLoggedUser(subjectUser))
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+
+        // TODO: premestiti u Service
+
+        userService.changeOwnPassword(password, subjectUser);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                 /*@NotBlank*/
+    public ResponseEntity<UserDTO> changeOwnData(@RequestBody UserDTO newData, @PathVariable Long id) {
+        User foundUser = this.userService.findById(id);
+
+        if (foundUser == null)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+
+        userService.changeOwnData(newData, foundUser);
+        return new ResponseEntity<UserDTO>(new UserDTO(foundUser), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
+    public ResponseEntity<String> removeUser(@PathVariable Long id) {
+        User foundUser = userService.findById(id);
+        if(foundUser == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        userService.remove(foundUser);
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
+    @PutMapping("/ban")
+    @PreAuthorize("hasRole('ADMIN'")
+    public ResponseEntity<Void> banUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingBannedId, Principal principal) {
+        User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
+        if (!userService.moderatesCommunity(communityId, moderator) ) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        if(userService.findById(userBeingBannedId) == null || communityService.findById(communityId) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userService.banUserFromCommunity(communityId, userBeingBannedId, moderator.getId());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> invalidateToken() {
+        // TODO:
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

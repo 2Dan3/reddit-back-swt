@@ -1,6 +1,8 @@
 package rs.ftn.RedditCopyCat.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
@@ -9,25 +11,27 @@ import rs.ftn.RedditCopyCat.model.enums.Roles;
 import rs.ftn.RedditCopyCat.repository.UserRepository;
 import rs.ftn.RedditCopyCat.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
+    @Autowired
     private UserRepository userRepository;
-
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository){
-        this.userRepository = userRepository;
-    }
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
-        this.passwordEncoder = passwordEncoder;
-    }
+//    @Autowired
+//    public UserServiceImpl(UserRepository userRepository){
+//        this.userRepository = userRepository;
+//    }
+//
+//    @Autowired
+//    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
     @Override
     public User findByUsername(String username) {
@@ -76,4 +80,50 @@ public class UserServiceImpl implements UserService {
 //        }
 //        return null;
     }
+
+    @Override
+    public void changeOwnData(UserDTO newData, User currentUser) {
+        currentUser.setDisplayName(newData.getDisplayName());
+        currentUser.setDescription(newData.getDescription());
+        currentUser.setAvatar(newData.getAvatar());
+        userRepository.save(currentUser);
+    }
+
+    @Override
+    public void changeOwnPassword(String password, User foundUser) {
+        foundUser.setPassword(passwordEncoder.encode(password));
+        userRepository.save(foundUser);
+    }
+
+    @Override
+    public void remove(User foundUser) {
+        userRepository.delete(foundUser);
+    }
+
+    @Override
+    public boolean isLoggedUser(User subjectUser) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String usernameOfLogged;
+
+        if (principal instanceof UserDetails) {
+            usernameOfLogged = ((UserDetails)principal).getUsername();
+        } else {
+            usernameOfLogged = principal.toString();
+        }
+
+        if (subjectUser.getUsername().equals(usernameOfLogged))
+            return true;
+        return false;
+    }
+
+    @Override
+    public void banUserFromCommunity(Long communityId, Long userId, Long moderatorId) {
+        userRepository.banUserFromCommunity(communityId, userId, moderatorId, LocalDate.now());
+    }
+
+    @Override
+    public boolean moderatesCommunity(Long communityId, User moderator) {
+        return userRepository.findModerator(communityId, moderator.getId()) == 0?false:true;
+    }
+
 }

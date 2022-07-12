@@ -1,7 +1,6 @@
 package rs.ftn.RedditCopyCat.model.entity;
 
 import lombok.*;
-import rs.ftn.RedditCopyCat.model.entity.Moderator;
 import rs.ftn.RedditCopyCat.model.enums.Roles;
 
 import javax.persistence.*;

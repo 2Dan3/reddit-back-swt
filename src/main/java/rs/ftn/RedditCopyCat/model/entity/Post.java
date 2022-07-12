@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "post")
 @Getter
 @Setter
 @NoArgsConstructor
