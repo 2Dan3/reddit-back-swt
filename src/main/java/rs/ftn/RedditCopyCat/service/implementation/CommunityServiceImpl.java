@@ -1,6 +1,7 @@
 package rs.ftn.RedditCopyCat.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.repository.CommunityRepository;
@@ -9,6 +10,7 @@ import rs.ftn.RedditCopyCat.service.CommunityService;
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class CommunityServiceImpl implements CommunityService {
 
     @Autowired

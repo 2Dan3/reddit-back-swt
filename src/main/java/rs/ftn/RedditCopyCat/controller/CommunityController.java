@@ -39,7 +39,7 @@ public class CommunityController {
 //    @Autowired
 //    private Principal principal;
 
-    @GetMapping(value = "/")
+    @GetMapping()
     public ResponseEntity<List<CommunityDTO>> getAllCommunities() {
 
         List<Community> communities = communityService.findAll();
@@ -169,7 +169,7 @@ public class CommunityController {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 //            OR HttpStatus.NOT_FOUND
         }
         Post targetedPost = postService.findById(postId);

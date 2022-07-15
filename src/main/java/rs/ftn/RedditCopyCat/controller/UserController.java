@@ -116,8 +116,6 @@ public class UserController {
         if (!userService.isLoggedUser(subjectUser))
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        // TODO: premestiti u Service
-
         userService.changeOwnPassword(password, subjectUser);
         return new ResponseEntity<>(null, HttpStatus.OK);
     }

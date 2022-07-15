@@ -11,6 +11,7 @@ import rs.ftn.RedditCopyCat.model.enums.Roles;
 import rs.ftn.RedditCopyCat.repository.UserRepository;
 import rs.ftn.RedditCopyCat.service.UserService;
 
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private Principal principal;
 
 //    @Autowired
 //    public UserServiceImpl(UserRepository userRepository){
@@ -102,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isLoggedUser(User subjectUser) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String usernameOfLogged;
 
         if (principal instanceof UserDetails) {

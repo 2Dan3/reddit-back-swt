@@ -42,10 +42,12 @@ public class Community {
     @Column
     private String suspensionReason;
 
+    //    TODO EAGER ili LAZY ?
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Post> posts = new HashSet<Post>();
+
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Flair> flairs = new HashSet<Flair>();
 
-//    TODO EAGER ili LAZY ?
-    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Post> posts = new HashSet<Post>();
+
 }
