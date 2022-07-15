@@ -1,5 +1,6 @@
 package rs.ftn.RedditCopyCat.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,9 +22,10 @@ public class Flair {
     @Column(name = "flair_id", nullable = false)
     private Long id;
 
-    @Column
+    @Column(name = "name", unique = true)
     private String name;
 
+//    @JsonIgnore
 //    TODO parametrizovati manytomany annotation?
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Community> communities = new HashSet<Community>();

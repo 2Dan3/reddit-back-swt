@@ -13,6 +13,9 @@ public class Rule {
     @Column(name = "rule_id", nullable = false)
     private Long id;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne
     private Community belongsToCommunity;
 }

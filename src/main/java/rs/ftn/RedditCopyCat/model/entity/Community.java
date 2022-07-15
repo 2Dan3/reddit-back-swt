@@ -27,7 +27,7 @@ public class Community {
     @ManyToMany(mappedBy = "moderatedCommunities")
     private Set<User> moderators = new HashSet<User>();
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column

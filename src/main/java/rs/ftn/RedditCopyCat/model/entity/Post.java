@@ -1,8 +1,10 @@
 package rs.ftn.RedditCopyCat.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import rs.ftn.RedditCopyCat.model.DTO.PostDTO;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -31,7 +33,6 @@ public class Post {
     @Column
     private String imagePath;
 
-//    TODO treba li "cascadeAll"?
 //    TODO treba li "EAGER" uopste?
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "flair_id")
@@ -41,8 +42,19 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User postedByUser;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+//    TODO: @JsonIgnore
+    @ManyToOne()
     @JoinColumn(name = "community_id")
     private Community community;
 
+//    public Post(PostDTO postDTO) {
+////        this.id = postDTO.getId();
+//        this.title = postDTO.getTitle();
+//        this.text = postDTO.getText();
+//        // TODO: check if Date is persisted or null
+//        this.creationDate = postDTO.getCreationDate();
+//        this.imagePath = postDTO.getImagePath();
+//        this.flair = flairService.findByName(postDTO.getFlairName());
+//        this.community = communityService
+//    }
 }

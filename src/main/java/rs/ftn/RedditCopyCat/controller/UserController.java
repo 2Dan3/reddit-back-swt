@@ -17,6 +17,7 @@ import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
 import rs.ftn.RedditCopyCat.model.DTO.UserTokenState;
 import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.security.TokenUtils;
+import rs.ftn.RedditCopyCat.service.CommunityService;
 import rs.ftn.RedditCopyCat.service.UserService;
 import rs.ftn.RedditCopyCat.service.implementation.UserServiceImpl;
 
@@ -29,6 +30,7 @@ import java.util.List;
 @RequestMapping("reddit/users")
 public class UserController {
 
+    CommunityService communityService;
     UserService userService;
     UserDetailsService userDetailsService;
     AuthenticationManager authenticationManager;
@@ -144,7 +146,7 @@ public class UserController {
     }
 
     @PutMapping("/ban")
-    @PreAuthorize("hasRole('ADMIN'")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> banUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingBannedId, Principal principal) {
         User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
         if (!userService.moderatesCommunity(communityId, moderator) ) {
