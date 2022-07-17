@@ -204,20 +204,7 @@ public class CommunityController {
         }
         return new ResponseEntity<>(flairsDTO, HttpStatus.OK);
     }
-    //TODO *  !  !  !  *
-    @GetMapping(value = "/{communityId}/rules")
-    public ResponseEntity<List<RuleDTO>> getCommunityRules(@PathVariable Long communityId) {
 
-        // JOIN FETCH query
-        Set<Rule> rules = rulesService.findByCommunityId(communityId);
-
-        List<RuleDTO> rulesDTO = new ArrayList<>();
-        for (Rule r : rules) {
-            RuleDTO ruleDTO = new RuleDTO(r);
-            rulesDTO.add(ruleDTO);
-        }
-        return new ResponseEntity<>(rulesDTO, HttpStatus.OK);
-    }
 
     @PutMapping(value = "/{communityId}/ban")
     @PreAuthorize("hasRole('ADMIN')")

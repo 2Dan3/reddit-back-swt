@@ -18,4 +18,19 @@ public class RuleServiceImpl implements RulesService {
     public Set<Rule> findByCommunityId(Long communityId) {
         return ruleRepository.findByCommunityId(communityId);
     }
+
+    @Override
+    public Rule save(Rule createdRule) {
+        return ruleRepository.save(createdRule);
+    }
+
+    @Override
+    public Rule findById(Long ruleId) {
+        return ruleRepository.findById(ruleId).orElse(null);
+    }
+
+    @Override
+    public void remove(Rule wantedRule) {
+        ruleRepository.delete(wantedRule);
+    }
 }

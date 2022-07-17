@@ -8,4 +8,10 @@ import java.util.Set;
 public interface RulesService {
 
     Set<Rule> findByCommunityId(Long communityId);
+
+    Rule save(Rule createdRule);
+
+    Rule findById(Long ruleId);
+
+    void remove(Rule wantedRule);
 }
