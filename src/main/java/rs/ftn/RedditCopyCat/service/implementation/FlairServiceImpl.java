@@ -16,4 +16,14 @@ public class FlairServiceImpl implements FlairService {
     public Flair findByName(String flairName) {
         return flairRepository.findByName(flairName);
     }
+
+    @Override
+    public Flair findByNameForCommunityId(String flairName, Long communityId) {
+        return flairRepository.findByNameForCommunityId(flairName, communityId);
+    }
+
+    @Override
+    public Flair findOneWithCommunities(String flair) {
+        return flairRepository.findOneWithCommunities(flair);
+    }
 }

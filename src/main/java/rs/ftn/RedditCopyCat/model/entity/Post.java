@@ -34,7 +34,7 @@ public class Post {
     private String imagePath;
 
 //    TODO treba li "EAGER" uopste?
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST} )
     @JoinColumn(name = "flair_id")
     private Flair flair;
 

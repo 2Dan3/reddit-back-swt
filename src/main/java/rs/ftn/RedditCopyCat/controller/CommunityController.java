@@ -1,5 +1,6 @@
 package rs.ftn.RedditCopyCat.controller;
 
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -208,10 +209,11 @@ public class CommunityController {
 
     @PutMapping(value = "/{communityId}/ban")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> banCommunity(@RequestBody CommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> banCommunity(@RequestBody CommunityDTO communityDTO, @PathVariable Long communityId) {
 
         // community must exist
 //        TODO  findByName mozda bolje ako ne zelim ID u DTO da se mapira sa JSON ?
+//        Community community = communityService.findById(communityDTO.getId());
         Community community = communityService.findByName(communityDTO.getName());
 
         if (community == null) {
@@ -222,7 +224,75 @@ public class CommunityController {
         community.setSuspensionReason(communityDTO.getSuspensionReason());
 
         community = communityService.save(community);
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(new CommunityDTO(community), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{communityId}/posts/{postId}/flair")
+    @PreAuthorize("hasAnyRole")
+    public ResponseEntity<FlairDTO> getFlairOfPost(@PathVariable Long communityId, @PathVariable Long postId) {
+//        find by ID only, no join fetch needed since flair field in Post is EAGERLY loaded
+        Post containingPost = postService.findById(postId);
+        if (containingPost == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Flair wantedFlair = containingPost.getFlair();
+        if (wantedFlair == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(new FlairDTO(wantedFlair), HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{communityId}/posts/{postId}/flair")
+    @PreAuthorize("hasRole('ADMIN')")                   /*@Validated*/
+    public ResponseEntity<Void> setFlairForPost(@RequestBody FlairDTO flairDTO, @PathVariable Long communityId, @PathVariable Long postId) {
+//        find by ID only, no join fetch needed since flair field is EAGERLY loaded in Post
+        Post containingPost = postService.findById(postId);
+        if (containingPost == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Flair wantedFlair = flairService.findByNameForCommunityId(flairDTO.getName(), communityId);
+        if (wantedFlair == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        containingPost.setFlair(wantedFlair);
+        postService.save(containingPost);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{communityId}/flairs/{flair}")
+    @PreAuthorize("hasAnyRole")
+    public ResponseEntity<FlairDTO> getFlairOfCommunity(@PathVariable Long communityId, @PathVariable String flair) {
+//        comm & flair in it - must exist
+        Community containingCommunity = communityService.findOneWithFlairs(communityId);
+        if (containingCommunity == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Flair wantedFlair = flairService.findByName(flair);
+
+        if (wantedFlair != null && containingCommunity.getFlairs().contains(wantedFlair)) {
+            return new ResponseEntity<>(new FlairDTO(wantedFlair), HttpStatus.OK);
+        };
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    @DeleteMapping(value = "/{communityId}/flairs/{flair}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteFlair(@PathVariable Long communityId, @PathVariable String flair) {
+        Community containingCommunity = communityService.findOneWithFlairs(communityId);
+
+        if (containingCommunity == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        Flair wantedFlair = flairService.findOneWithCommunities(flair);
+
+        if (wantedFlair != null && containingCommunity.getFlairs().contains(wantedFlair)) {
+            containingCommunity.removeFlair(wantedFlair);
+            communityService.save(containingCommunity);
+            return new ResponseEntity<>(HttpStatus.OK);
+        };
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 }
