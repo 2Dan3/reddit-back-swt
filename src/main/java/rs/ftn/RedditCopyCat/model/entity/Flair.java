@@ -8,6 +8,7 @@ import rs.ftn.RedditCopyCat.model.entity.Community;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -19,7 +20,7 @@ public class Flair {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "flair_id", nullable = false)
+    @Column(name = "flair_id", nullable = false, unique = true)
     private Long id;
 
     @Column(name = "name", unique = true)
@@ -29,4 +30,23 @@ public class Flair {
 //    TODO parametrizovati manytomany annotation?
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Community> communities = new HashSet<Community>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Flair f = (Flair) o;
+        if (f.name == null || name == null)
+            return false;
+        return Objects.equals(name, f.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
 }

@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_id", nullable = false)
+    @Column(name = "report_id", nullable = false, unique = true)
     private Long id;
 
     @Column(nullable = false)
@@ -27,12 +27,30 @@ public class Report {
     @ManyToOne
     private User byUser;
 
-    @Column
+    @Column(nullable = false)
     private boolean accepted;
+//    Boolean
 
     @ManyToOne
     private Post forPost;
 
     @ManyToOne
     private Comment forComment;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Report r = (Report) o;
+        return id != null && id.equals(r.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return 1821;
+    }
 }

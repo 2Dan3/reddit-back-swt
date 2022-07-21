@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -61,10 +62,13 @@ public class TokenUtils {
     }
 
     /*Provera validnosti tokena: period vazenja i provera username-a korisnika*/
-    public boolean validateToken(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
+        SimpleGrantedAuthority sga = (SimpleGrantedAuthority) userDetails.getAuthorities().toArray()[0];
+        sga.getAuthority();
         return username.equals(userDetails.getUsername())
                 && !isTokenExpired(token);
+//        TODO: && if getStringRoleFromToken(token) == ( (SimpleGrantedAuthority) userDetails.getAuthorities().toArray()[0] ).getAuthority().substring(5)
     }
 
     /*Generisanje tokena za korisnika - postavljanje svih potrebnih informacija,

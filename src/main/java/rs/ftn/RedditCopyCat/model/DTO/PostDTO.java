@@ -5,14 +5,17 @@ import lombok.Getter;
 import lombok.Setter;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 public class PostDTO {
     private Long id;
+    @NotBlank
     private String title;
     private String author;
+    @NotBlank
     private String text;
     private LocalDate creationDate;
     private String imagePath;
@@ -30,7 +33,7 @@ public class PostDTO {
         this.flairName = post.getFlair().getName();
     }
                     /*Long id*/
-    public PostDTO(String title, String author, String text, LocalDate creationDate, String imagePath, String flairName) {
+    public PostDTO(String title, String author, String text, String imagePath, String flairName) {
 //        this.id = id;
         this.title = title;
         this.author = author;

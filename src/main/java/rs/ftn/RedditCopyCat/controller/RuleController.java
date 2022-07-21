@@ -3,6 +3,7 @@ package rs.ftn.RedditCopyCat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.RuleDTO;
 import rs.ftn.RedditCopyCat.model.entity.Community;
@@ -38,8 +39,8 @@ public class RuleController {
         return new ResponseEntity<>(rulesDTO, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/")                   /*@Validated*/
-    public ResponseEntity<RuleDTO> createRule(@RequestBody RuleDTO ruleDTO, @PathVariable Long communityId) {
+    @PostMapping(value = "/")
+    public ResponseEntity<RuleDTO> createRule(@RequestBody @Validated RuleDTO ruleDTO, @PathVariable Long communityId) {
 
         // JOIN FETCH query
         Community targetedCommunity = communityService.findById(communityId);

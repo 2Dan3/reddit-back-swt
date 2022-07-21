@@ -4,16 +4,17 @@ import lombok.*;
 import rs.ftn.RedditCopyCat.model.enums.Roles;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "user")
 @Getter
 @Setter
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -23,7 +24,7 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, unique = true)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -32,7 +33,6 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
-//    @Email
     @Column
     private String email;
 
@@ -69,4 +69,19 @@ public class User implements Serializable {
     public String getRole(){
         return this.getClass().getAnnotation(DiscriminatorValue.class).toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        if (user.username == null || username == null) return false;
+        return Objects.equals(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username);
+    }
+
 }

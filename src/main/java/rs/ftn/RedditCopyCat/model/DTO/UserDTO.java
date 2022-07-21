@@ -4,6 +4,7 @@ package rs.ftn.RedditCopyCat.model.DTO;
 import lombok.Data;
 import rs.ftn.RedditCopyCat.model.entity.User;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 @Data
@@ -16,7 +17,9 @@ public class UserDTO {
 
     @NotBlank
     private String password;
+
     @NotBlank
+    @Email(message = "Invalid email format", regexp = ".+[@].+[\\.].+")
     private String email;
 
     private String avatar;
@@ -30,7 +33,7 @@ public class UserDTO {
         this.username = createdUser.getUsername();
         this.avatar = createdUser.getAvatar();
         this.email = createdUser.getEmail();
-        this.displayName = createdUser.getDisplayName();
+        this.displayName = createdUser.getDisplayName() == null? this.username : createdUser.getDisplayName();
         this.description = createdUser.getDescription();
     }
 

@@ -68,7 +68,7 @@ public class CommunityController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<CommunityDTO> createCommunity(@RequestBody CommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> createCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
 
         Community community = new Community();
         community.setName(communityDTO.getName());
@@ -80,7 +80,7 @@ public class CommunityController {
     }
 
     @PutMapping(consumes = "application/json")
-    public ResponseEntity<CommunityDTO> updateCommunity(@RequestBody CommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> updateCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
 
         // community must exist
 //        TODO  findByName mozda bolje ako ne zelim ID u DTO da se mapira sa JSON ?
@@ -143,8 +143,8 @@ public class CommunityController {
     }
 
     // TODO: how to getLoggedUser from ReceivedJWToken
-    @PostMapping(value = "/{communityId}/posts")                                        /*@Validated*/
-    public ResponseEntity<Void> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody PostDTO postSent) {
+    @PostMapping(value = "/{communityId}/posts")
+    public ResponseEntity<Void> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
@@ -156,17 +156,16 @@ public class CommunityController {
         newPost.setText(postSent.getText());
         newPost.setImagePath(postSent.getImagePath());
         newPost.setCreationDate(LocalDate.now());
-        newPost.setCommunity(community);
         newPost.setFlair(flairService.findByName(postSent.getFlairName()));
 //TODO:        newPost.setPostedByUser();
+        community.addPost(newPost);
 
-        community.getPosts().add(newPost);
         communityService.save(community);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{communityId}/posts/{postId}")                               /*@Validated*/
-    public ResponseEntity<Void> updatePost(@PathVariable Long communityId, @RequestBody PostDTO postSent, @PathVariable Long postId) {
+    @PutMapping(value = "/{communityId}/posts/{postId}")
+    public ResponseEntity<Void> updatePost(@PathVariable Long communityId, @RequestBody @Validated PostDTO postSent, @PathVariable Long postId) {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
@@ -209,7 +208,7 @@ public class CommunityController {
 
     @PutMapping(value = "/{communityId}/ban")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityDTO> banCommunity(@RequestBody CommunityDTO communityDTO, @PathVariable Long communityId) {
+    public ResponseEntity<CommunityDTO> banCommunity(@RequestBody @Validated CommunityDTO communityDTO, @PathVariable Long communityId) {
 
         // community must exist
 //        TODO  findByName mozda bolje ako ne zelim ID u DTO da se mapira sa JSON ?
@@ -220,7 +219,7 @@ public class CommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        community.setIsSuspended(true);
+        community.setSuspended(true);
         community.setSuspensionReason(communityDTO.getSuspensionReason());
 
         community = communityService.save(community);
@@ -243,8 +242,8 @@ public class CommunityController {
     }
 
     @PutMapping(value = "/{communityId}/posts/{postId}/flair")
-    @PreAuthorize("hasRole('ADMIN')")                   /*@Validated*/
-    public ResponseEntity<Void> setFlairForPost(@RequestBody FlairDTO flairDTO, @PathVariable Long communityId, @PathVariable Long postId) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> setFlairForPost(@RequestBody @Validated FlairDTO flairDTO, @PathVariable Long communityId, @PathVariable Long postId) {
 //        find by ID only, no join fetch needed since flair field is EAGERLY loaded in Post
         Post containingPost = postService.findById(postId);
         if (containingPost == null)

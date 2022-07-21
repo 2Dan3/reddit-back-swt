@@ -1,9 +1,13 @@
 package rs.ftn.RedditCopyCat.model.DTO;
 
+import javax.validation.constraints.NotBlank;
+
 // DTO za login
 public class JwtAuthenticationRequest {
 
+    @NotBlank
     private String username;
+    @NotBlank
     private String password;
 
     public JwtAuthenticationRequest() {

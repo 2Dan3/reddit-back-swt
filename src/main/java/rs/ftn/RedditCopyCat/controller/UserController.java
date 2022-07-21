@@ -45,8 +45,8 @@ public class UserController {
         this.tokenUtils = tokenUtils;
     }
 
-    @PostMapping()                                          /*@Validated*/
-    public ResponseEntity<UserDTO> registerNewUser(@RequestBody  UserDTO newUser){
+    @PostMapping()
+    public ResponseEntity<UserDTO> registerNewUser(@RequestBody  @Validated UserDTO newUser){
 
         User createdUser = userService.createUser(newUser);
 
@@ -60,7 +60,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(
-            @RequestBody JwtAuthenticationRequest authenticationRequest, HttpServletResponse response) {
+            @RequestBody @Validated JwtAuthenticationRequest authenticationRequest, HttpServletResponse response) {
 
         // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
         // AuthenticationException
@@ -104,11 +104,12 @@ public class UserController {
         return new ResponseEntity<UserDTO>(new UserDTO(foundUser), HttpStatus.OK);
     }
 
-    // TODO: PUT Password (Encoding)
-
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                 /*@NotBlank*/
-    public ResponseEntity<String> changeOwnPassword(@PathVariable Long id, @RequestBody String password) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
+    public ResponseEntity<String> changeOwnPassword(@PathVariable Long id, @RequestBody @NotBlank String password) {
+        if (password == null || "".equals(password.trim()))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
         User subjectUser = this.userService.findById(id);
 
         if (subjectUser == null)
@@ -121,8 +122,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                 /*@NotBlank*/
-    public ResponseEntity<UserDTO> changeOwnData(@RequestBody UserDTO newData, @PathVariable Long id) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
+    public ResponseEntity<UserDTO> changeOwnData(@RequestBody @Validated UserDTO newData, @PathVariable Long id) {
         User foundUser = this.userService.findById(id);
 
         if (foundUser == null)

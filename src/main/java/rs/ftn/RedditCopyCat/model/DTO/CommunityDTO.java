@@ -4,14 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import rs.ftn.RedditCopyCat.model.entity.Community;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @AllArgsConstructor
 @Data
 public class CommunityDTO {
 
+    @NotBlank
     private String name;
+    @NotBlank
     private String description;
+    @NotBlank
     private LocalDate creationDate;
     private boolean isSuspended;
     private String suspensionReason;
@@ -20,7 +24,7 @@ public class CommunityDTO {
        this.name = comm.getName();
        this.description = comm.getDescription();
        this.creationDate = comm.getCreationDate();
-       this.isSuspended = comm.getIsSuspended();
+       this.isSuspended = comm.isSuspended();
        this.suspensionReason = comm.getSuspensionReason();
     }
 

@@ -16,4 +16,6 @@ public interface CommentService {
     Set<Comment> findRepliesTo(Long parentId);
 
     Comment attachComment(Post targetedPost, Long parentId, String text);
+
+    void deleteAllForPost(Post targetedPost);
 }

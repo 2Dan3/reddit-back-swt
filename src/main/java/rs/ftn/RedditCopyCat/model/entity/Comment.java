@@ -16,7 +16,7 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id", nullable = false)
+    @Column(name = "comment_id", nullable = false, unique = true)
     private Long id;
 
     @Column
@@ -26,7 +26,8 @@ public class Comment {
     private LocalDate timestamp;
 
     @Column(nullable = false)
-    private Boolean isDeleted;
+    private boolean isDeleted;
+//    Boolean
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Post belongsToPost;
@@ -38,4 +39,21 @@ public class Comment {
 //    @OneToMany(mappedBy = "repliesTo", cascade = CascadeType.ALL)
     @ManyToOne()
     private Comment parentComment;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Comment c = (Comment) o;
+        return id != null && id.equals(c.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return 2111;
+    }
 }

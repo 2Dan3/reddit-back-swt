@@ -18,13 +18,13 @@ public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id", nullable = false)
+    @Column(name = "post_id", nullable = false, unique = true)
     private Long id;
 
     @Column(nullable = false)
     private String title;
 
-    @Column
+    @Column(nullable = false)
     private String text;
 
     @Column(nullable = false)
@@ -43,7 +43,8 @@ public class Post {
     private User postedByUser;
 
 //    TODO: @JsonIgnore
-    @ManyToOne()
+//    TODO: Skinuti fetch = FetchType.EAGER ?
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "community_id")
     private Community community;
 
@@ -57,4 +58,20 @@ public class Post {
 //        this.flair = flairService.findByName(postDTO.getFlairName());
 //        this.community = communityService
 //    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Post p = (Post) o;
+        return id != null && id.equals(p.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return 1554;
+    }
 }

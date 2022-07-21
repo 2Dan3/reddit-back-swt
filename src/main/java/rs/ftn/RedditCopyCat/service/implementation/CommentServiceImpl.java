@@ -63,4 +63,9 @@ public class CommentServiceImpl implements CommentService {
         return commentService.save(madeComment);
     }
 
+    @Override
+    public void deleteAllForPost(Post targetedPost) {
+//        *TODO: *Delete all for post and call deletion of Reports & Reactions to this Comment
+    }
+
 }

@@ -19,7 +19,7 @@ public class Community {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "community_id", nullable = false)
+    @Column(name = "community_id", nullable = false, unique = true)
     private Long id;
 
 //    @OneToOne(fetch = FetchType.LAZY)
@@ -38,12 +38,12 @@ public class Community {
     private LocalDate creationDate;
 
     @Column(nullable = false)
-    private Boolean isSuspended;
+    private boolean isSuspended;
+//    Boolean
 
     @Column
     private String suspensionReason;
 
-    //    TODO EAGER ili LAZY ?
     @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Post> posts = new HashSet<Post>();
 
@@ -60,6 +60,14 @@ public class Community {
     public void removeFlair(Flair flair) {
         flairs.remove(flair);
         flair.getCommunities().remove(this);
+    }
+    public void addPost(Post post) {
+        posts.add(post);
+        post.setCommunity(this);
+    }
+    public void removePost(Post post) {
+        posts.remove(post);
+        post.setCommunity(null);
     }
     @Override
     public boolean equals(Object o) {

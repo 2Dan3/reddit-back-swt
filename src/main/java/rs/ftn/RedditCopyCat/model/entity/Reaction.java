@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class Reaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reaction_id", nullable = false)
+    @Column(name = "reaction_id", nullable = false, unique = true)
     private Long id;
 
     @Column(nullable = false)
@@ -30,4 +30,21 @@ public class Reaction {
 
     @ManyToOne
     private User madeBy;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Reaction reaction = (Reaction) o;
+        return id != null && id.equals(reaction.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return 2337;
+    }
 }

@@ -6,6 +6,7 @@ import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.model.entity.User;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Getter
@@ -13,7 +14,9 @@ import java.time.LocalDate;
 public class CommentDTO {
 
     private Long id;
+    @NotBlank
     private String text;
+    @NotBlank
     private LocalDate timestamp;
     private Long postId;
     private String authorDisplayName;
@@ -26,5 +29,13 @@ public class CommentDTO {
         this.postId = c.getBelongsToPost().getId();
         this.authorDisplayName = c.getBelongsToUser().getDisplayName();
 //        this.parentCommentId = c.getParentComment().getId();
+    }
+
+    public CommentDTO(Long id, String text, LocalDate timestamp, Long postId, String authorDisplayName) {
+        this.id = id;
+        this.text = text;
+        this.timestamp = timestamp;
+        this.postId = postId;
+        this.authorDisplayName = authorDisplayName;
     }
 }

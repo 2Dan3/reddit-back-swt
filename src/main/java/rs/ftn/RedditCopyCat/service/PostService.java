@@ -7,4 +7,6 @@ public interface PostService {
     Post findById(Long postId);
 
     Post save(Post containingPost);
+
+    void delete(Post targetedPost);
 }

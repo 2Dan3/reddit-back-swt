@@ -3,6 +3,7 @@ package rs.ftn.RedditCopyCat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.CommentDTO;
 import rs.ftn.RedditCopyCat.model.DTO.FlairDTO;
@@ -45,7 +46,7 @@ public class PostController {
             resultComments = commentService.findAllForPost(postId);
         }else {
             Comment parent = commentService.findById(parentId);
-            if (parent == null || parent.getIsDeleted()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            if (parent == null || parent.isDeleted()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
             resultComments = commentService.findRepliesTo(parentId);
         }
@@ -64,15 +65,15 @@ public class PostController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
         Comment wantedComment = commentService.findById(commentId);
-        if (wantedComment == null || wantedComment.getIsDeleted()) {
+        if (wantedComment == null || wantedComment.isDeleted()) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
         return new ResponseEntity<>(new CommentDTO(wantedComment), HttpStatus.OK);
     }
 
-    @PostMapping("/{postId}/comments?replyToId={parentId}")                            /*@Validated*/
-    public ResponseEntity<CommentDTO> makeComment(@PathVariable Long postId, @RequestBody CommentDTO receivedComment, @RequestParam Long parentId) {
+    @PostMapping("/{postId}/comments/{parentId}")
+    public ResponseEntity<CommentDTO> makeComment(@PathVariable Long postId, @RequestBody @Validated CommentDTO receivedComment, @PathVariable Long parentId) {
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -81,7 +82,7 @@ public class PostController {
     }
 
     @PutMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentDTO> getAllReplies(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody CommentDTO receivedComment) {
+    public ResponseEntity<CommentDTO> getAllReplies(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody @Validated CommentDTO receivedComment) {
 
         Comment targetComment = commentService.findById(commentId);
         if (postService.findById(postId) == null || targetComment == null)
@@ -101,10 +102,21 @@ public class PostController {
         if (postService.findById(postId) == null || targetComment == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        targetComment.setIsDeleted(true);
+        targetComment.setDeleted(true);
 
         targetComment = commentService.save(targetComment);
         return new ResponseEntity<>(new CommentDTO(targetComment), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+        Post targetedPost = postService.findById(postId);
+        if (targetedPost == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        targetedPost.getCommunity().removePost(targetedPost);
+        postService.delete(targetedPost);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
