@@ -48,6 +48,11 @@ public class Community {
     private Set<Post> posts = new HashSet<Post>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "communities_flairs",
+            joinColumns = @JoinColumn(name = "community_id"),
+            inverseJoinColumns = @JoinColumn(name = "flair_id")
+    )
     private Set<Flair> flairs = new HashSet<Flair>();
 
 

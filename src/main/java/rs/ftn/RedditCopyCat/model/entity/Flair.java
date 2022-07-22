@@ -28,7 +28,7 @@ public class Flair {
 
 //    @JsonIgnore
 //    TODO parametrizovati manytomany annotation?
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "flairs", fetch = FetchType.LAZY)
     private Set<Community> communities = new HashSet<Community>();
 
     @Override

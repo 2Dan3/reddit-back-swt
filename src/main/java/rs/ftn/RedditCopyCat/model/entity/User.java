@@ -4,7 +4,6 @@ import lombok.*;
 import rs.ftn.RedditCopyCat.model.enums.Roles;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -13,10 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "user")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "role", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("USER")
