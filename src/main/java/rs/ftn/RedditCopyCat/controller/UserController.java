@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.JwtAuthenticationRequest;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
 import rs.ftn.RedditCopyCat.model.DTO.UserTokenState;
+import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.security.TokenUtils;
 import rs.ftn.RedditCopyCat.service.CommunityService;
@@ -151,10 +152,13 @@ public class UserController {
         if (!userService.moderatesCommunity(communityId, moderator) ) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
-        if(userService.findById(userBeingBannedId) == null || communityService.findById(communityId) == null) {
+
+        User userBeingBanned = userService.findById(userBeingBannedId);
+        Community community = communityService.findById(communityId);
+        if(userBeingBanned == null || community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        userService.banUserFromCommunity(communityId, userBeingBannedId, moderator.getId());
+        userService.banUserFromCommunity(community, userBeingBanned, moderator);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

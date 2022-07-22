@@ -14,13 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findFirstByUsername(String username);
 
-    @Query("insert into banned (timestamp, bannedBy, bannedUser, forCommunity) " +
-                    "values (:timeStamp, :moderatorId, :userId, :communityId")
-    void banUserFromCommunity(
-            @Param("communityId") Long communityId,
-            @Param("userId") Long userId,
-            @Param("moderatorId") Long moderatorId,
-            @Param("timeStamp") LocalDate now);
 
     //    TODO: Return type boolean ili int?
     @Query(nativeQuery = true,

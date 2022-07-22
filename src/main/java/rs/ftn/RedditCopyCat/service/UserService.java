@@ -1,6 +1,7 @@
 package rs.ftn.RedditCopyCat.service;
 
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
+import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.User;
 
 import java.util.List;
@@ -23,7 +24,9 @@ public interface UserService {
 
     boolean isLoggedUser(User subjectUser);
 
-    void banUserFromCommunity(Long communityId, Long userId, Long moderatorId);
+    void banUserFromCommunity(Community community, User userBeingBanned, User moderator);
 
     boolean moderatesCommunity(Long communityId, User moderator);
+
+    boolean isUserBanned(User user, Community community);
 }

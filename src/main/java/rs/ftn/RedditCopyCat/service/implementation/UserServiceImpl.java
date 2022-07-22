@@ -6,35 +6,39 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
+import rs.ftn.RedditCopyCat.model.entity.Banned;
+import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.model.enums.Roles;
+import rs.ftn.RedditCopyCat.repository.BannedRepository;
 import rs.ftn.RedditCopyCat.repository.UserRepository;
 import rs.ftn.RedditCopyCat.service.UserService;
 
-import java.security.Principal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
+    private BannedRepository bannedRepository;
     private UserRepository userRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private Principal principal;
+//    @Autowired
+//    private Principal principal;
 
-//    @Autowired
-//    public UserServiceImpl(UserRepository userRepository){
-//        this.userRepository = userRepository;
-//    }
-//
-//    @Autowired
-//    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
-//        this.passwordEncoder = passwordEncoder;
-//    }
+    private PasswordEncoder passwordEncoder;
+
+
+    @Autowired
+    public UserServiceImpl(/*PasswordEncoder passwordEnc, */BannedRepository bannedRepository, UserRepository userRepository) {
+//        this.passwordEncoder = passwordEnc;
+        this.bannedRepository = bannedRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Override
     public User findByUsername(String username) {
@@ -105,7 +109,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isLoggedUser(User subjectUser) {
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String usernameOfLogged;
 
         if (principal instanceof UserDetails) {
@@ -120,13 +124,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void banUserFromCommunity(Long communityId, Long userId, Long moderatorId) {
-        userRepository.banUserFromCommunity(communityId, userId, moderatorId, LocalDate.now());
+    public void banUserFromCommunity(Community community, User userBeingBanned, User moderator) {
+        bannedRepository.save(new Banned(moderator, userBeingBanned, community));
     }
 
     @Override
     public boolean moderatesCommunity(Long communityId, User moderator) {
         return userRepository.findModerator(communityId, moderator.getId()) == 0?false:true;
+    }
+
+    @Override
+    public boolean isUserBanned(User user, Community community) {
+        return bannedRepository.existsBan(user.getId(), community.getId()) == 0?false:true;
     }
 
 }

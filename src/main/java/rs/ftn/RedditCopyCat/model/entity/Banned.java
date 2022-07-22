@@ -1,6 +1,7 @@
 package rs.ftn.RedditCopyCat.model.entity;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 @Data
 @Entity
 @Table(name = "banned")
+@NoArgsConstructor
 public class Banned {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,14 @@ public class Banned {
 
     @ManyToOne
     private Community forCommunity;
+
+    public Banned(User bannedBy, User bannedUser, Community forCommunity) {
+
+        this.bannedBy = bannedBy;
+        this.bannedUser = bannedUser;
+        this.forCommunity = forCommunity;
+        this.timestamp = LocalDate.now();
+    }
 
     @Override
     public boolean equals(Object o) {
