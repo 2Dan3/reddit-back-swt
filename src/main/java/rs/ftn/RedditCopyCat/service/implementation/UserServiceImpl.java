@@ -1,6 +1,7 @@
 package rs.ftn.RedditCopyCat.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,16 +30,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Autowired
-    public UserServiceImpl(/*PasswordEncoder passwordEnc, */BannedRepository bannedRepository, UserRepository userRepository) {
-//        this.passwordEncoder = passwordEnc;
+    public UserServiceImpl(@Lazy PasswordEncoder passwordEnc, BannedRepository bannedRepository, UserRepository userRepository) {
+        this.passwordEncoder = passwordEnc;
         this.bannedRepository = bannedRepository;
         this.userRepository = userRepository;
     }
 
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
-        this.passwordEncoder = passwordEncoder;
-    }
+//    @Autowired
+//    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
+//        this.passwordEncoder = passwordEncoder;
+//    }
 
     @Override
     public User findByUsername(String username) {
