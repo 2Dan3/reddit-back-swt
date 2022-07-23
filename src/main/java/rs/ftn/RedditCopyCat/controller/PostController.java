@@ -16,9 +16,7 @@ import rs.ftn.RedditCopyCat.service.PostService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
 import java.security.Principal;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -35,21 +33,26 @@ public class PostController {
     @Autowired
     Principal principal;
 
-    @GetMapping("/{postId}/comments?replyToId{parentId}")
-    public ResponseEntity<List<CommentDTO>> getComments(@PathVariable Long postId, @RequestParam Long parentId) {
+//    TODO: Sort by Reactions
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<List<CommentDTO>> getComments(@PathVariable Long postId,
+                                                        @RequestParam(name = "replyToId", defaultValue = "null") Long parentId,
+                                                        @RequestParam(name = "sortBy", defaultValue = "timestamp") String criteria,
+                                                        @RequestParam(name = "sort", defaultValue = "desc") String sortDirection) {
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
-        Set<Comment> resultComments;
+        List<Comment> resultComments;
 
         if (parentId == null) {
-            resultComments = commentService.findAllForPost(postId);
+            resultComments = commentService.findAllForPost(postId, criteria, sortDirection);
         }else {
             Comment parent = commentService.findById(parentId);
             if (parent == null || parent.isDeleted()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-            resultComments = commentService.findRepliesTo(parentId);
+            resultComments = commentService.findRepliesTo(parentId, criteria, sortDirection);
         }
+        if (resultComments == null) { return new ResponseEntity<>(HttpStatus.BAD_REQUEST); }
 
         List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : resultComments) {

@@ -3,17 +3,22 @@ package rs.ftn.RedditCopyCat.service;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 
+import java.util.List;
 import java.util.Set;
 
 public interface CommentService {
 
-    Set<Comment> findAllForPost(Long postId);
+    List<Comment> findAllForPost(Long postId, String criteria, String sortDirection);
 
     Comment findById(Long commentId);
 
+    List<Comment> findAllNewestFirst();
+
+    List<Comment> findAllOldestFirst();
+
     Comment save(Comment madeComment);
 
-    Set<Comment> findRepliesTo(Long parentId);
+    List<Comment> findRepliesTo(Long parentId, String criteria, String sortDirection);
 
     Comment attachComment(Post targetedPost, Long parentId, String text);
 

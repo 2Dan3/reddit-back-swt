@@ -1,6 +1,7 @@
 package rs.ftn.RedditCopyCat.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
@@ -10,7 +11,7 @@ import rs.ftn.RedditCopyCat.service.UserService;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @Service
 public class CommentServiceImpl implements CommentService {
@@ -25,8 +26,16 @@ public class CommentServiceImpl implements CommentService {
     Principal principal;
 
     @Override
-    public Set<Comment> findAllForPost(Long postId) {
-        return commentRepository.findAllForPost(postId);
+    public List<Comment> findAllForPost(Long postId, String criteria, String sortDirection) {
+        criteria = criteria.toLowerCase();
+        sortDirection = sortDirection.toLowerCase();
+
+        if (criteria.equals("timestamp") && (sortDirection.equals("desc") || sortDirection.equals("asc")) )
+            return commentRepository.findAllForPost(postId, criteria, sortDirection);
+        else if (criteria.equals("reactions"))
+            return commentRepository.findAllSortedByReactions();
+        else
+            return null;
     }
 
     @Override
@@ -35,13 +44,23 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<Comment> findAllNewestFirst() {
+        return commentRepository.findAll(Sort.by("timestamp").ascending());
+    }
+
+    @Override
+    public List<Comment> findAllOldestFirst() {
+        return commentRepository.findAll(Sort.by("timestamp").descending());
+    }
+
+    @Override
     public Comment save(Comment madeComment) {
         return commentRepository.save(madeComment);
     }
 
     @Override
-    public Set<Comment> findRepliesTo(Long parentId) {
-        return commentRepository.findRepliesTo(parentId);
+    public List<Comment> findRepliesTo(Long parentId, String criteria, String sortDirection) {
+        return commentRepository.findRepliesTo(parentId, criteria, sortDirection);
     }
 
     public Comment attachComment(Post targetedPost, Long parentId, String commentText) {
@@ -50,11 +69,11 @@ public class CommentServiceImpl implements CommentService {
 
         if (parentId != null) {
             Comment parentComment = findById(parentId);
-            if (parentComment != null && !parentComment.getIsDeleted())
+            if (parentComment != null && !parentComment.isDeleted())
                 madeComment.setParentComment(parentComment);
         }
 
-        madeComment.setIsDeleted(false);
+        madeComment.setDeleted(false);
         madeComment.setTimestamp(LocalDate.now());
         madeComment.setText(commentText);
         madeComment.setBelongsToPost(targetedPost);
