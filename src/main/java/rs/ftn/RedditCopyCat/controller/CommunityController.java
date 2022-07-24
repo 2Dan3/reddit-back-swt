@@ -109,7 +109,7 @@ public class CommunityController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    //TODO *  !  !  !  *
+    //TODO: reactions-sorted, trending-sorted
     @GetMapping(value = "/{communityId}/posts")
     public ResponseEntity<List<PostDTO>> getCommunityPosts(@PathVariable Long communityId) {
 

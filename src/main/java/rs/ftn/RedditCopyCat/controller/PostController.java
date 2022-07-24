@@ -36,23 +36,25 @@ public class PostController {
 //    TODO: Sort by Reactions
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentDTO>> getComments(@PathVariable Long postId,
-                                                        @RequestParam(name = "replyToId", defaultValue = "null") Long parentId,
+                                                        @RequestParam(name = "replyToId", required = false) Long parentId,
                                                         @RequestParam(name = "sortBy", defaultValue = "timestamp") String criteria,
                                                         @RequestParam(name = "sort", defaultValue = "desc") String sortDirection) {
+        if ( !commentService.areSortParamsValid(criteria, sortDirection))
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
         Post targetedPost = postService.findById(postId);
-        if (targetedPost == null) return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        if (targetedPost == null)
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         List<Comment> resultComments;
-
         if (parentId == null) {
             resultComments = commentService.findAllForPost(postId, criteria, sortDirection);
         }else {
             Comment parent = commentService.findById(parentId);
-            if (parent == null || parent.isDeleted()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
+            if (parent == null || parent.isDeleted())
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             resultComments = commentService.findRepliesTo(parentId, criteria, sortDirection);
         }
-        if (resultComments == null) { return new ResponseEntity<>(HttpStatus.BAD_REQUEST); }
 
         List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : resultComments) {

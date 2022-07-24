@@ -23,4 +23,6 @@ public interface CommentService {
     Comment attachComment(Post targetedPost, Long parentId, String text);
 
     void deleteAllForPost(Post targetedPost);
+
+    boolean areSortParamsValid(String criteria, String sortDirection);
 }

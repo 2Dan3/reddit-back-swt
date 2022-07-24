@@ -30,12 +30,12 @@ public class CommentServiceImpl implements CommentService {
         criteria = criteria.toLowerCase();
         sortDirection = sortDirection.toLowerCase();
 
-        if (criteria.equals("timestamp") && (sortDirection.equals("desc") || sortDirection.equals("asc")) )
+        if (criteria.equals("timestamp"))
             return commentRepository.findAllForPost(postId, criteria, sortDirection);
-        else if (criteria.equals("reactions"))
-            return commentRepository.findAllSortedByReactions();
-        else
-            return null;
+        else {
+            criteria = criteria.toUpperCase();
+            return commentRepository.findAllSortedByReactions(postId, criteria, sortDirection);
+        }
     }
 
     @Override
@@ -60,7 +60,15 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<Comment> findRepliesTo(Long parentId, String criteria, String sortDirection) {
-        return commentRepository.findRepliesTo(parentId, criteria, sortDirection);
+        criteria = criteria.toLowerCase();
+        sortDirection = sortDirection.toLowerCase();
+
+        if (criteria.equals("timestamp"))
+            return commentRepository.findRepliesTo(parentId, criteria, sortDirection);
+        else {
+            criteria = criteria.toUpperCase();
+            return commentRepository.findAllRepliesSortedByReactions(parentId, criteria, sortDirection);
+        }
     }
 
     public Comment attachComment(Post targetedPost, Long parentId, String commentText) {
@@ -85,6 +93,14 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteAllForPost(Post targetedPost) {
 //        *TODO: *Delete all for post and call deletion of Reports & Reactions to this Comment
+    }
+
+    @Override
+    public boolean areSortParamsValid(String criteria, String sortDirection) {
+        criteria = criteria.toLowerCase();
+        sortDirection = sortDirection.toLowerCase();
+        return (sortDirection.equals("desc") || sortDirection.equals("asc"))
+                && (criteria.equals("timestamp") || criteria.equals("upvote") || criteria.equals("downvote"));
     }
 
 }
