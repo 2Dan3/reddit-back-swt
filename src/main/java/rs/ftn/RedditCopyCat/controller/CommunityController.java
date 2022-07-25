@@ -109,15 +109,20 @@ public class CommunityController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    //TODO: reactions-sorted, trending-sorted
     @GetMapping(value = "/{communityId}/posts")
-    public ResponseEntity<List<PostDTO>> getCommunityPosts(@PathVariable Long communityId) {
+    public ResponseEntity<List<PostDTO>> getCommunityPosts(@PathVariable Long communityId,
+                                                           @RequestParam(name = "sortBy", defaultValue = "creation_date") String criteria,
+                                                           @RequestParam(name = "sort", defaultValue = "desc") String sortDirection) {
+        if ( !postService.areSortParamsValid(criteria, sortDirection))
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
-        Community community = communityService.findOneWithPosts(communityId);
+        Community community = communityService.findById(communityId);
+        if (community == null || community.isSuspended())
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        //ako je podesen fetchType LAZY i pozovemo findOne umesto findOneWithPosts,
-        //na poziv getPosts bismo dobili LazyInitializationException
-        Set<Post> posts = community.getPosts();
+        List<Post> posts =
+            postService.findAllFromCommunitySortedBy(communityId, criteria, sortDirection);
+
         List<PostDTO> postsDTO = new ArrayList<>();
 
         for (Post p : posts) {

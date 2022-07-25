@@ -8,6 +8,8 @@ import rs.ftn.RedditCopyCat.repository.PostRepository;
 import rs.ftn.RedditCopyCat.service.CommentService;
 import rs.ftn.RedditCopyCat.service.PostService;
 
+import java.util.List;
+
 @Service
 public class PostServiceImpl implements PostService {
 
@@ -39,4 +41,27 @@ public class PostServiceImpl implements PostService {
         reactionService.deleteAllForPost(targetedPost);
         postRepository.delete(targetedPost);
     }
+
+    @Override
+    public boolean areSortParamsValid(String criteria, String sortDirection) {
+        criteria = criteria.toLowerCase();
+        sortDirection = sortDirection.toLowerCase();
+        return (sortDirection.equals("desc") || sortDirection.equals("asc"))
+                && (criteria.equals("creation_date") || criteria.equals("upvote")
+                || criteria.equals("downvote") || criteria.equals("trending"));
+    }
+
+    @Override
+    public List<Post> findAllFromCommunitySortedBy(Long communityId, String criteria, String sortDirection) {
+
+        if (criteria.equalsIgnoreCase("creation_date")) {
+            return postRepository.findPostsSortedByDate(communityId, sortDirection);
+        }else if (criteria.equalsIgnoreCase("trending")) {
+            return postRepository.findPostsSortedByTrending(communityId, sortDirection);
+        }else
+            // in this case: criteria equals downvote || upvote
+            return postRepository.findPostsSortedByPopularity(communityId, sortDirection, criteria.toUpperCase());
+    }
+
+
 }
