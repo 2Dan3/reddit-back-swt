@@ -1,5 +1,6 @@
 package rs.ftn.RedditCopyCat.service;
 
+import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface PostService {
     boolean areSortParamsValid(String criteria, String sortDirection);
 
     List<Post> findAllFromCommunitySortedBy(Long communityId, String criteria, String sortDirection);
+
+    void deleteAllPostsFromCommunity(Community c);
 }

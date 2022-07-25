@@ -3,10 +3,13 @@ package rs.ftn.RedditCopyCat.service.implementation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.repository.CommentRepository;
 import rs.ftn.RedditCopyCat.service.CommentService;
+import rs.ftn.RedditCopyCat.service.ReactionService;
+import rs.ftn.RedditCopyCat.service.ReportService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
 import java.security.Principal;
@@ -19,7 +22,9 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     CommentRepository commentRepository;
     @Autowired
-    CommentService commentService;
+    ReportService reportService;
+    @Autowired
+    ReactionService reactionService;
     @Autowired
     UserService userService;
     @Autowired
@@ -87,12 +92,16 @@ public class CommentServiceImpl implements CommentService {
         madeComment.setBelongsToPost(targetedPost);
         madeComment.setBelongsToUser(userService.findByUsername(principal.getName()));
 
-        return commentService.save(madeComment);
+        return save(madeComment);
     }
 
+    @Transactional
     @Override
     public void deleteAllForPost(Post targetedPost) {
 //        *TODO: *Delete all for post and call deletion of Reports & Reactions to this Comment
+        reportService.deleteAllForCommentsToPost(targetedPost);
+        reactionService.deleteAllForCommentsToPost(targetedPost);
+        commentRepository.deleteAllForPost(targetedPost.getId());
     }
 
     @Override

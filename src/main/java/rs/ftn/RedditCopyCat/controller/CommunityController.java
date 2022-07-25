@@ -70,10 +70,13 @@ public class CommunityController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<CommunityDTO> createCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
 
+//        *TODO: check if community with unique same name Exists already
+
         Community community = new Community();
         community.setName(communityDTO.getName());
         community.setDescription(communityDTO.getDescription());
         community.setCreationDate(LocalDate.now());
+        community.setSuspended(false);
 
         community = communityService.save(community);
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.CREATED);
@@ -100,7 +103,9 @@ public class CommunityController {
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteCommunity(@PathVariable Long id) {
 
-        Community community = communityService.findById(id);
+        // *Important: foreach in postService needs getPosts() to remove all, findById(id) here would
+        // throw LazyInitializationException later on
+        Community community = communityService.findOneWithPosts(id);
 
         if (community != null) {
             communityService.remove(community);

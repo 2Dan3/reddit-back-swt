@@ -44,7 +44,7 @@ public class Community {
     @Column
     private String suspensionReason;
 
-    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private Set<Post> posts = new HashSet<Post>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

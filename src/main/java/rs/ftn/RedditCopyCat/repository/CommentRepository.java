@@ -1,10 +1,13 @@
 package rs.ftn.RedditCopyCat.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
+import rs.ftn.RedditCopyCat.model.entity.Post;
 
 import java.util.List;
 
@@ -36,4 +39,11 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllRepliesSortedByReactions(@Param("parentId") Long parentCommentId,
                                                   @Param("criteria") String criteria,
                                                   @Param("sortDirection") String sortDirection);
+
+    @Transactional
+    @Modifying
+    @Query(nativeQuery = true, value =
+    "delete from comment " +
+            "where belongs_to_post_post_id = :postId")
+    void deleteAllForPost(@Param("postId") Long postId);
 }
