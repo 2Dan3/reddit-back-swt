@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ftn.RedditCopyCat.model.entity.Reaction;
 
+import java.util.Set;
+
 @Repository
 public interface ReactionRepository extends JpaRepository<Reaction, Long> {
 
@@ -25,4 +27,34 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
         "delete from reaction " +
             "where to_post_post_id = :postId")
     void deleteAllForPost(@Param("postId") Long postId);
+
+    @Query(nativeQuery = true, value =
+            "select from reaction " +
+                    "where to_post_post_id = :postId")
+    Set<Reaction> findAllForPostId(@Param("postId") Long postId);
+
+    @Query(nativeQuery = true, value =
+            "select from reaction " +
+                    "where to_comment_comment_id = :commentId")
+    Set<Reaction> findAllForCommentId(@Param("commentId") Long commentId);
+
+
+    //    TODO: getTotalKarmaForUserId
+    @Query(nativeQuery = true, value =
+        "")
+    Integer getTotalKarmaForUserId(@Param("userId") Long userId);
+
+
+    @Query(nativeQuery = true, value =
+        "select * from reaction" +
+                "where made_by_user_id = :userId and " +
+                    "to_post_post_id = :postId")
+    Reaction findForPostByUser(@Param("postId") Long postId, @Param("userId") Long userId);
+
+    @Query(nativeQuery = true, value =
+            "select * from reaction " +
+                    "where made_by_user_id = :userId and " +
+                    "to_comment_comment_id = :postId")
+    Reaction findForCommentByUser(@Param("commentId") Long commentId, @Param("userId") Long userId);
+
 }

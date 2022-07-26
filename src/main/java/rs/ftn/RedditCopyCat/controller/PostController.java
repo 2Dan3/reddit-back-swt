@@ -33,7 +33,6 @@ public class PostController {
     @Autowired
     Principal principal;
 
-//    TODO: Sort by Reactions
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentDTO>> getComments(@PathVariable Long postId,
                                                         @RequestParam(name = "replyToId", required = false) Long parentId,

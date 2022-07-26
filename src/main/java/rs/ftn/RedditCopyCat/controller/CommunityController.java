@@ -188,7 +188,8 @@ public class CommunityController {
         }
         targetedPost.setTitle(postSent.getTitle());
         targetedPost.setText(postSent.getText());
-        targetedPost.setImagePath(postSent.getImagePath());
+//       TODO: poseban API -/endpoint
+//        targetedPost.setImagePath(postSent.getImagePath());
         // TODO: treba li i promena Flair-a?
 //        targetedPost.setFlair(flairService.findByName(postSent.getFlairName()));
 
