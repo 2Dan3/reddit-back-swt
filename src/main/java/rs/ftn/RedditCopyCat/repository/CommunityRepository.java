@@ -7,6 +7,8 @@ import rs.ftn.RedditCopyCat.model.entity.Community;
 
 import java.util.Optional;
 
+//        TODO FindBy/findAll should return null if isDeleted(); !  !  !
+
 @Repository
 public interface CommunityRepository extends JpaRepository<Community, Long> {
 

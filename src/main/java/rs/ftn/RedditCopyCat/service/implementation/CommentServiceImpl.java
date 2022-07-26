@@ -98,10 +98,17 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public void deleteAllForPost(Post targetedPost) {
-//        *TODO: *Delete all for post and call deletion of Reports & Reactions to this Comment
         reportService.deleteAllForCommentsToPost(targetedPost);
         reactionService.deleteAllForCommentsToPost(targetedPost);
         commentRepository.deleteAllForPost(targetedPost.getId());
+    }
+
+    @Override
+    public void deleteVisibility(Comment comment) {
+        if (comment != null) {
+            comment.setDeleted(true);
+            save(comment);
+        }
     }
 
     @Override

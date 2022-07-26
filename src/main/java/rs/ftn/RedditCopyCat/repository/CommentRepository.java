@@ -11,6 +11,8 @@ import rs.ftn.RedditCopyCat.model.entity.Post;
 
 import java.util.List;
 
+//        TODO FindBy/findAll should return null if isDeleted(); !  !  !
+
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 

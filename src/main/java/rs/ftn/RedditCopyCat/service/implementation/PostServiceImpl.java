@@ -35,14 +35,15 @@ public class PostServiceImpl implements PostService {
         return postRepository.save(containingPost);
     }
 
-//    TODO: confirm that @Transactional is functioning properly
     @Transactional
     @Override
     public void delete(Post targetedPost) {
-        commentService.deleteAllForPost(targetedPost);
-        reportService.deleteAllForPost(targetedPost);
-        reactionService.deleteAllForPost(targetedPost);
-        postRepository.delete(targetedPost);
+        if (targetedPost != null) {
+            commentService.deleteAllForPost(targetedPost);
+            reportService.deleteAllForPost(targetedPost);
+            reactionService.deleteAllForPost(targetedPost);
+            postRepository.delete(targetedPost);
+        }
     }
 
     @Override

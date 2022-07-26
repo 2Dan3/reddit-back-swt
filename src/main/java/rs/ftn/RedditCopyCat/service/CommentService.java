@@ -24,5 +24,7 @@ public interface CommentService {
 
     void deleteAllForPost(Post targetedPost);
 
+    void deleteVisibility(Comment comment);
+
     boolean areSortParamsValid(String criteria, String sortDirection);
 }

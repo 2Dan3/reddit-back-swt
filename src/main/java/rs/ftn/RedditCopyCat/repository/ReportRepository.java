@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ftn.RedditCopyCat.model.entity.Report;
 
+import java.util.Set;
+
 @Repository
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
@@ -25,4 +27,24 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
         "delete from report " +
             "where for_post_post_id = :postId")
     void deleteAllForPost(@Param("postId") Long postId);
+
+
+    //    TODO: check Query
+    @Query(nativeQuery = true, value =
+        "select r.* " +
+        "from report r, post p " +
+        "where " +
+            "r.for_post_post_id = p.post_id and " +
+            "p.community_id = :communityId")
+    Set<Report> findForPostsInCommunity(@Param("communityId") Long communityId);
+
+//    TODO: check Query
+    @Query(nativeQuery = true, value =
+        "select r.* " +
+        "from report r, comment c, post p" +
+        "where " +
+            "r.for_comment_comment_id = c.comment_id and " +
+            "c.belongs_to_post_post_id = p.post_id and " +
+            "p.community_id = :communityId")
+    Set<Report> findForCommentsInCommunity(@Param("communityId") Long communityId);
 }
