@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.*;
 import rs.ftn.RedditCopyCat.model.entity.*;
+import rs.ftn.RedditCopyCat.model.enums.ReactionType;
 import rs.ftn.RedditCopyCat.service.*;
 
 import java.security.Principal;
@@ -33,6 +34,8 @@ public class CommunityController {
     private FlairService flairService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ReactionService reactionService;
 //    @Autowired
 //    private Principal principal;
 
@@ -154,13 +157,14 @@ public class CommunityController {
         return new ResponseEntity<>(new PostDTO(post), HttpStatus.OK);
     }
 
-    // TODO: how to getLoggedUser from ReceivedJWToken
+    // TODO*: how to getLoggedUser from ReceivedJWToken for setting Reaction-author & newPost.setPostedByUser() ?
+    // TODO*: how to get back ID of newPost from DB by calling postService.save(newPost) b4 the communityService.save(), without persistence errors
     @PostMapping(value = "/{communityId}/posts")
-    public ResponseEntity<Void> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
+    public ResponseEntity<Integer> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         Post newPost = new Post();
@@ -169,10 +173,11 @@ public class CommunityController {
         newPost.setImagePath(postSent.getImagePath());
         newPost.setCreationDate(LocalDate.now());
         newPost.setFlair(flairService.findByName(postSent.getFlairName()));
-//TODO:        newPost.setPostedByUser();
+//TODO:        newPost.setPostedByUser(creator);
         community.addPost(newPost);
-
         communityService.save(community);
+        //TODO:        reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

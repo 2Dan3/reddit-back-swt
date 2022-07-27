@@ -15,6 +15,7 @@ import rs.ftn.RedditCopyCat.model.entity.Flair;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.service.CommentService;
 import rs.ftn.RedditCopyCat.service.PostService;
+import rs.ftn.RedditCopyCat.service.ReactionService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
 import javax.servlet.ServletContext;
@@ -33,6 +34,8 @@ public class PostController {
     private CommentService commentService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ReactionService reactionService;
     @Autowired
     private Principal principal;
     @Autowired
@@ -87,6 +90,7 @@ public class PostController {
         if (targetedPost == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Comment madeComment = commentService.attachComment(targetedPost, parentId, receivedComment.getText());
+        //TODO:        reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
         return new ResponseEntity<>(new CommentDTO(madeComment), HttpStatus.CREATED);
     }
 

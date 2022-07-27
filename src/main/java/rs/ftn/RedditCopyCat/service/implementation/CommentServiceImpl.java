@@ -90,6 +90,8 @@ public class CommentServiceImpl implements CommentService {
         madeComment.setTimestamp(LocalDate.now());
         madeComment.setText(commentText);
         madeComment.setBelongsToPost(targetedPost);
+//        TODO*: fix setBelongToUser argument, findByUsername from JWT
+//         // & call a function to check whether returned user is logged in currently in securityContext
         madeComment.setBelongsToUser(userService.findByUsername(principal.getName()));
 
         return save(madeComment);

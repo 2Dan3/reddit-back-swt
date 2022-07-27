@@ -1,12 +1,17 @@
 package rs.ftn.RedditCopyCat.model.entity;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import rs.ftn.RedditCopyCat.model.enums.ReactionType;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "reaction")
 public class Reaction {
@@ -46,5 +51,13 @@ public class Reaction {
     @Override
     public int hashCode() {
         return 2337;
+    }
+
+    public Reaction(ReactionType type, Post toPost, Comment toComment, User madeBy) {
+        this.type = type;
+        this.toPost = toPost;
+        this.toComment = toComment;
+        this.madeBy = madeBy;
+        this.timestamp = LocalDate.now();
     }
 }
