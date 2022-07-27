@@ -74,6 +74,14 @@ public class Community {
         posts.remove(post);
         post.setCommunity(null);
     }
+    public void addModerator(User creator) {
+        moderators.add(creator);
+        creator.getModeratedCommunities().add(this);
+    }
+    public void removeModerator(User moderator) {
+        moderators.remove(moderator);
+        moderator.getModeratedCommunities().remove(this);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -53,9 +53,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserDTO userDTO) {
 
-        Optional<User> user = userRepository.findFirstByUsername(userDTO.getUsername());
-
-        if(user.isPresent()){
+        if ( !existsForUsernameOrEmail(userDTO.getUsername(), userDTO.getEmail()) ) {
             return null;
         }
 
@@ -67,6 +65,11 @@ public class UserServiceImpl implements UserService {
         newUser = userRepository.save(newUser);
 
         return newUser;
+    }
+
+    private boolean existsForUsernameOrEmail(String username, String email) {
+        return userRepository.findFirstByUsername(username).isPresent() ||
+                userRepository.findFirstByEmail(email).isPresent();
     }
 
     @Override

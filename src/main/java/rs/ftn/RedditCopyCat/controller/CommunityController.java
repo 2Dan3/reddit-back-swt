@@ -10,14 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.*;
-import rs.ftn.RedditCopyCat.model.entity.Community;
-import rs.ftn.RedditCopyCat.model.entity.Flair;
-import rs.ftn.RedditCopyCat.model.entity.Post;
-import rs.ftn.RedditCopyCat.model.entity.Rule;
-import rs.ftn.RedditCopyCat.service.CommunityService;
-import rs.ftn.RedditCopyCat.service.FlairService;
-import rs.ftn.RedditCopyCat.service.PostService;
-import rs.ftn.RedditCopyCat.service.RulesService;
+import rs.ftn.RedditCopyCat.model.entity.*;
+import rs.ftn.RedditCopyCat.service.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -37,6 +31,8 @@ public class CommunityController {
     private PostService postService;
     @Autowired
     private FlairService flairService;
+    @Autowired
+    private UserService userService;
 //    @Autowired
 //    private Principal principal;
 
@@ -70,13 +66,19 @@ public class CommunityController {
     @PostMapping(consumes = "application/json")
     public ResponseEntity<CommunityDTO> createCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
 
-//        *TODO: check if community with unique same name Exists already
+        if (communityService.findByName(communityDTO.getName()) != null) {
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        }
+
+//        TODO: how to receive incoming user/creator ID !  !  !
+//        User creator = userService.findById(creatorId);
 
         Community community = new Community();
         community.setName(communityDTO.getName());
         community.setDescription(communityDTO.getDescription());
         community.setCreationDate(LocalDate.now());
         community.setSuspended(false);
+//        community.addModerator(creator);
 
         community = communityService.save(community);
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.CREATED);
