@@ -39,10 +39,32 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
     Set<Reaction> findAllForCommentId(@Param("commentId") Long commentId);
 
 
-    //    TODO: getTotalKarmaForUserId
     @Query(nativeQuery = true, value =
-        "")
+        "select sum(u) - sum(d) " +
+                "from " +
+                "(select sum(r.type='UPVOTE') as u,  sum(r.type='DOWNVOTE') as d " +
+                "from post p, reaction r " +
+                "where p.user_id = :userId and " +
+                "r.to_post_post_id = p.post_id " +
+                "union " +
+                "select sum(r.type='UPVOTE') as u, sum(r.type='DOWNVOTE') as d " +
+                "from comment c, reaction r " +
+                "where c.belongs_to_user_user_id = :userId and " +
+                "r.to_comment_comment_id = c.comment_id)")
     Integer getTotalKarmaForUserId(@Param("userId") Long userId);
+
+//    TODO: AN ALTERNATIVE VERSION - TEST the main 1st:
+//    @Query(nativeQuery = true, value =
+//        "select sum(r.type='UPVOTE') - sum(r.type='DOWNVOTE') " +
+//                "from post p, reaction r " +
+//                "where p.user_id = :userId and " +
+//                "r.to_post_post_id = p.post_id " +
+//                "union " +
+//                "select sum(r.type='UPVOTE') - sum(r.type='DOWNVOTE') " +
+//                "from comment c, reaction r " +
+//                "where c.belongs_to_user_user_id = :userId and " +
+//                "r.to_comment_comment_id = c.comment_id;")
+//    Integer getTotalKarmaForUserId(@Param("userId") Long userId);
 
 
     @Query(nativeQuery = true, value =
