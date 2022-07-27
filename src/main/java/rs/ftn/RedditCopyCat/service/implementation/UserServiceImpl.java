@@ -137,6 +137,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void unbanUserFromCommunity(Community community, User userBeingUnBanned) {
+    //  TODO*: check on Iterable of *banRecords*, if it throws errors
+        Iterable<Banned> banRecords = bannedRepository.findByCommunityAndUser(community.getId(), userBeingUnBanned.getId());
+        if (banRecords.iterator().hasNext()) {
+            bannedRepository.deleteAll(banRecords);
+        }
+    }
+
+    @Override
     public boolean moderatesCommunity(Long communityId, User moderator) {
         return userRepository.findModerator(communityId, moderator.getId()) == 0?false:true;
     }

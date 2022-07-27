@@ -150,8 +150,10 @@ public class UserController {
     }
 
     @PutMapping("/ban")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> banUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingBannedId, Principal principal) {
+
+//        TODO*: check this line, does it return the right logged/auth'd user ?
         User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
         if (!userService.moderatesCommunity(communityId, moderator) ) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -163,6 +165,25 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         userService.banUserFromCommunity(community, userBeingBanned, moderator);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/unban")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> unbanUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingUnBannedId, Principal principal) {
+
+    //        TODO*: check this line, does it return the right logged/auth'd user ?
+        User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
+        if (!userService.moderatesCommunity(communityId, moderator) ) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        User userBeingUnBanned = userService.findById(userBeingUnBannedId);
+        Community community = communityService.findById(communityId);
+        if(userBeingUnBanned == null || community == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        userService.unbanUserFromCommunity(community, userBeingUnBanned);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

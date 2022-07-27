@@ -26,6 +26,8 @@ public interface UserService {
 
     void banUserFromCommunity(Community community, User userBeingBanned, User moderator);
 
+    void unbanUserFromCommunity(Community community, User userBeingUnBanned);
+
     boolean moderatesCommunity(Long communityId, User moderator);
 //    TODO: use for checks in Web's configure()
     boolean isUserBanned(User user, Community community);
