@@ -18,7 +18,7 @@ public interface UserService {
 
     void changeOwnData(UserDTO newData, User currentUserData);
 
-    void changeOwnPassword(String password, User foundUser);
+    boolean changeOwnPassword(String oldPassword, String newPassword, User foundUser);
 
     void remove(User foundUser);
 

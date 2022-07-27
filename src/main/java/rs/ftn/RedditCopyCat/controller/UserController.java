@@ -25,17 +25,18 @@ import rs.ftn.RedditCopyCat.service.implementation.UserServiceImpl;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
 @RequestMapping("reddit/users")
 public class UserController {
 
-    CommunityService communityService;
-    UserService userService;
-    UserDetailsService userDetailsService;
-    AuthenticationManager authenticationManager;
-    TokenUtils tokenUtils;
+    private CommunityService communityService;
+    private UserService userService;
+    private UserDetailsService userDetailsService;
+    private AuthenticationManager authenticationManager;
+    private TokenUtils tokenUtils;
 
     @Autowired
     public UserController(UserServiceImpl userService, AuthenticationManager authenticationManager,
@@ -106,32 +107,35 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
-    public ResponseEntity<String> changeOwnPassword(@PathVariable Long id, @RequestBody @NotBlank String password) {
-        if (password == null || "".equals(password.trim()))
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                             // TODO: check HashMap - it contains old & new password
+    public ResponseEntity<Void> changeOwnPassword(@PathVariable Long id, @RequestBody @NotBlank HashMap<String, String> passwords) {
+//        if (password == null || "".equals(password.trim()))
+        if (passwords == null || passwords.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         User subjectUser = this.userService.findById(id);
 
         if (subjectUser == null)
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         if (!userService.isLoggedUser(subjectUser))
-            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        userService.changeOwnPassword(password, subjectUser);
-        return new ResponseEntity<>(null, HttpStatus.OK);
+        boolean passwordChangeSuccessful = userService.changeOwnPassword(passwords.get("oldPass"), passwords.get("newPass"), subjectUser);
+        if (!passwordChangeSuccessful)
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
-    public ResponseEntity<UserDTO> changeOwnData(@RequestBody @Validated UserDTO newData, @PathVariable Long id) {
-        User foundUser = this.userService.findById(id);
+    public ResponseEntity<UserDTO> changeOwnData(@RequestBody @Validated UserDTO newData) {
+        User foundUser = this.userService.findById(newData.getId());
 
         if (foundUser == null)
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 
         userService.changeOwnData(newData, foundUser);
-        return new ResponseEntity<UserDTO>(new UserDTO(foundUser), HttpStatus.OK);
+        return new ResponseEntity<>(new UserDTO(foundUser), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

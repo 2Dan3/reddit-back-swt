@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User newUser = new User();
+        newUser.setEmail(userDTO.getEmail());
         newUser.setUsername(userDTO.getUsername());
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         newUser.setRole(Roles.USER);
@@ -98,9 +99,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changeOwnPassword(String password, User foundUser) {
-        foundUser.setPassword(passwordEncoder.encode(password));
+    public boolean changeOwnPassword(String oldPassword, String newPassword, User foundUser) {
+        if (!passwordEncoder.matches(oldPassword, foundUser.getPassword()) )
+            return false;
+        foundUser.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(foundUser);
+        return true;
     }
 
     @Override

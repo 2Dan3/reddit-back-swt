@@ -1,10 +1,12 @@
 package rs.ftn.RedditCopyCat.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.support.ServletContextResource;
 import rs.ftn.RedditCopyCat.model.DTO.CommentDTO;
 import rs.ftn.RedditCopyCat.model.DTO.FlairDTO;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
@@ -15,6 +17,7 @@ import rs.ftn.RedditCopyCat.service.CommentService;
 import rs.ftn.RedditCopyCat.service.PostService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
+import javax.servlet.ServletContext;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +28,15 @@ import java.util.Set;
 public class PostController {
 
     @Autowired
-    PostService postService;
+    private PostService postService;
     @Autowired
-    CommentService commentService;
+    private CommentService commentService;
     @Autowired
-    UserService userService;
+    private UserService userService;
     @Autowired
-    Principal principal;
+    private Principal principal;
+    @Autowired
+    private ServletContext servletContext;
 
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentDTO>> getComments(@PathVariable Long postId,
@@ -120,6 +125,32 @@ public class PostController {
 
         targetedPost.getCommunity().removePost(targetedPost);
         postService.delete(targetedPost);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+//    TODO*: Image Get, Put, ?Post?
+
+    @GetMapping(value = "/{postId}/image")
+    public ResponseEntity<Resource> getImageForPost(@PathVariable Long postId) {
+        Post post = postService.findById(postId);
+        if (post == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        String pathToImage = post.getImagePath();
+//        TODO: . . .
+//
+        Resource resource =
+                new ServletContextResource(servletContext, pathToImage);
+        return new ResponseEntity<>(resource, HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/{postId}/image")
+    public ResponseEntity<Void> setImageForPost(@PathVariable Long postId, @RequestBody String imagePath) {
+        Post post = postService.findById(postId);
+        if (post == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        post.setImagePath(imagePath);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
