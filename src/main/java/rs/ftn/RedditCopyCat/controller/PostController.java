@@ -20,11 +20,9 @@ import rs.ftn.RedditCopyCat.service.ReactionService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
 import javax.servlet.ServletContext;
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(path = "${apiPrefix}/posts")
@@ -38,8 +36,6 @@ public class PostController {
     private UserService userService;
     @Autowired
     private ReactionService reactionService;
-    @Autowired
-    private Principal principal;
     @Autowired
     private ServletContext servletContext;
 
@@ -95,7 +91,7 @@ public class PostController {
 
         User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername() );
 
-        Comment madeComment = commentService.attachComment(targetedPost, parentId, receivedComment.getText());
+        Comment madeComment = commentService.attachComment(creator, targetedPost, parentId, receivedComment.getText());
         reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));
         return new ResponseEntity<>(new CommentDTO(madeComment), HttpStatus.CREATED);
     }

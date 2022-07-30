@@ -2,6 +2,7 @@ package rs.ftn.RedditCopyCat.service;
 
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
+import rs.ftn.RedditCopyCat.model.entity.User;
 
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,7 @@ public interface CommentService {
 
     List<Comment> findRepliesTo(Long parentId, String criteria, String sortDirection);
 
-    Comment attachComment(Post targetedPost, Long parentId, String text);
+    Comment attachComment(User creator, Post targetedPost, Long parentId, String text);
 
     void deleteAllForPost(Post targetedPost);
 

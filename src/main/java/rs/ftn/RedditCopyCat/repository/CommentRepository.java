@@ -16,11 +16,11 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("select c from Comment c where c.belongsToPost = ?1 order by ?2 ?3")
-    List<Comment> findAllForPost(Long postId, String criteria, String sortDirection);
+    @Query(nativeQuery = true, value = "select c from comment c where c.belongs_to_post_post_id = :postId order by :criteria :sortDirection")
+    List<Comment> findAllForPost(@Param("postId") Long postId, @Param("criteria") String criteria, @Param("sortDirection") String sortDirection);
 
-    @Query("select r from Comment r where r.parentComment = ?1 order by ?2 ?3")
-    List<Comment> findRepliesTo(Long parentId, String criteria, String sortDirection);
+    @Query(nativeQuery = true, value = "select r from comment r where r.parent_comment_comment_id = :parentId order by :criteria :sortDirection")
+    List<Comment> findRepliesTo(@Param("parentId") Long parentId, @Param("criteria") String criteria, @Param("sortDirection") String sortDirection);
 
     @Query(nativeQuery = true, value =
             "select c " +
@@ -50,7 +50,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     void deleteAllForPost(@Param("postId") Long postId);
 
     @Query(nativeQuery = true, value =
-        "select count(c) from comment c " +
+        "select count(c.comment_id) " +
+        "from comment c " +
         "where c.comment_id = :commentId and " +
                 "c.belongs_to_user_user_id = :userId")
     int countAuthor(@Param("commentId") Long commentId,@Param("userId") Long userId);

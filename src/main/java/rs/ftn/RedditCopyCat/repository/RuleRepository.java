@@ -11,7 +11,7 @@ import java.util.Set;
 public interface RuleRepository extends JpaRepository<Rule, Long> {
 
     //    TODO: Query -test run it
-//    @Query(nativeQuery = true, value = "select * from rule where belongs_to_community_community_id = ?")
+//    @Query(nativeQuery = true, value = "select * from rule where belongs_to_community_community_id = :communityId")
     @Query("select r from Rule r where r.belongsToCommunity =?1")
     Set<Rule> findByCommunityId(Long communityId);
 }

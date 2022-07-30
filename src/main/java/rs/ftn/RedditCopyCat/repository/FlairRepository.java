@@ -11,8 +11,13 @@ public interface FlairRepository extends JpaRepository<Flair, Long> {
     // TODO check
     Flair findByName(String flairName);
 
-//    *TODO: Refactor flair_communities & community_flairs into one ManyToMany table
-    @Query("select f from Flair f where f.flairName = ?1 and f.")
+    @Query(nativeQuery = true, value =
+        "select f.* " +
+        "from flair f, communities_flairs cf " +
+        "where " +
+            "f.name = :flairName and " +
+            "f.flair_id = cf.flair_id and " +
+            "cf.community_id = :communityId")
     Flair findByNameForCommunityId(String flairName, Long communityId);
 
     @Query("select f from Flair f join fetch f.communities c where f.name =?1")

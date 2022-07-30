@@ -12,7 +12,7 @@ import java.util.List;
 public interface BannedRepository extends JpaRepository<Banned, Long> {
 
     @Query(nativeQuery = true, value =
-        "select count(b) from banned b " +
+        "select count(b.ban_id) from banned b " +
         "where " +
             "b.banned_user_user_id = :userId and " +
             "for_community_community_id = :communityId")

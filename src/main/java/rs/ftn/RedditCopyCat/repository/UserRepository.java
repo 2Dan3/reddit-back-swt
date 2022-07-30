@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     //    TODO: Return type boolean ili Integer?
     @Query(nativeQuery = true,
-            value = "SELECT COUNT(m) FROM moderator m WHERE m.commu_id = :communityId and m.u_id = :userId")
+            value = "SELECT COUNT(m.*) FROM moderator m WHERE m.commu_id = :communityId and m.u_id = :userId")
     int findModerator(@Param("communityId") Long communityId,
                           @Param("userId") Long userId);
 }

@@ -12,7 +12,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(nativeQuery = true, value =
-            "select p " +
+            "select p.* " +
             "from post p " +
             "where p.community_id = :communityId " +
             "order by p.creation_date " +
@@ -22,14 +22,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //    TODO: Return type boolean ili Integer?
     @Query(nativeQuery = true, value =
-        "SELECT COUNT(p) FROM post p " +
+        "SELECT COUNT(p.post_id) FROM post p " +
         "WHERE p.post_id = :postId and " +
             "p.posted_by_user_user_id = :userId")
     int countAuthor(@Param("postId") Long postId,
                       @Param("userId") Long userId);
 
     @Query(nativeQuery = true, value =
-            "select p " +
+            "select p.* " +
             "from post p " +
             "where p.community_id = :communityId " +
             "order by " +
@@ -45,7 +45,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
     @Query(nativeQuery = true, value =
-            "select p " +
+            "select p.* " +
             "from post p " +
             "where p.community_id = :communityId " +
             "order by (( " +

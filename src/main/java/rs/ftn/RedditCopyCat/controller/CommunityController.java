@@ -1,6 +1,5 @@
 package rs.ftn.RedditCopyCat.controller;
 
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +35,6 @@ public class CommunityController {
     private UserService userService;
     @Autowired
     private ReactionService reactionService;
-//    @Autowired
-//    private Principal principal;
 
     @GetMapping()
     public ResponseEntity<List<CommunityDTO>> getAllCommunities() {
@@ -67,27 +64,28 @@ public class CommunityController {
     }
 
     @PostMapping(consumes = "application/json")
-    public ResponseEntity<CommunityDTO> createCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<CommunityDTO> createCommunity(Principal principal, @RequestBody @Validated CommunityDTO communityDTO) {
 
         if (communityService.findByName(communityDTO.getName()) != null) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
-//        TODO: how to receive incoming user/creator ID !  !  !
-//        User creator = userService.findById(creatorId);
+        User creator = userService.findByUsername( ((UserDetails)principal).getUsername() );
 
         Community community = new Community();
         community.setName(communityDTO.getName());
         community.setDescription(communityDTO.getDescription());
         community.setCreationDate(LocalDate.now());
         community.setSuspended(false);
-//        community.addModerator(creator);
+        community.addModerator(creator);
 
         community = communityService.save(community);
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.CREATED);
     }
 
     @PutMapping(consumes = "application/json")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<CommunityDTO> updateCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
 
         // community must exist
@@ -105,6 +103,7 @@ public class CommunityController {
     }
 
     @DeleteMapping(value = "/{communityId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteCommunity(@PathVariable Long communityId) {
 
         // *Important: foreach in postService needs getPosts() to remove all, findById(id) here would
@@ -158,6 +157,7 @@ public class CommunityController {
 
     // TODO*: how to get back ID of newPost from DB by calling postService.save(newPost) b4 the communityService.save(), without persistence errors
     @PostMapping(consumes = "application/json", value = "/{communityId}/posts")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Integer> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
 
         Community community = communityService.findOneWithPosts(communityId);
@@ -182,6 +182,7 @@ public class CommunityController {
     }
 
     @PutMapping(value = "/{communityId}/posts/{postId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> updatePost(@PathVariable Long communityId, @RequestBody @Validated PostDTO postSent, @PathVariable Long postId) {
 
         Community community = communityService.findOneWithPosts(communityId);
@@ -261,7 +262,7 @@ public class CommunityController {
     }
 
     @PutMapping(value = "/{communityId}/posts/{postId}/flair")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> setFlairForPost(@RequestBody @Validated FlairDTO flairDTO, @PathVariable Long communityId, @PathVariable Long postId) {
 //        find by ID only, no join fetch needed since flair field is EAGERLY loaded in Post
         Post containingPost = postService.findById(postId);
@@ -294,7 +295,7 @@ public class CommunityController {
     }
 
     @DeleteMapping(value = "/{communityId}/flairs/{flair}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> deleteFlair(@PathVariable Long communityId, @PathVariable String flair) {
         Community containingCommunity = communityService.findOneWithFlairs(communityId);
 

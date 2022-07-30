@@ -113,8 +113,8 @@ public class ReactionController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<ReactionDTO> changeOwnReaction(@RequestBody @Validated ReactionDTO receivedReaction, @PathVariable Long reactionId) {
 
-//        Reaction existingReaction = reactionService.findById(reactionId);
-        Reaction existingReaction = reactionService.findById(receivedReaction.getId());
+        Reaction existingReaction = reactionService.findById(reactionId);
+//        Reaction existingReaction = reactionService.findById(receivedReaction.getId());
         if (existingReaction == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 

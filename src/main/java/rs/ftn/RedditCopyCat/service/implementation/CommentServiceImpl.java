@@ -6,13 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
+import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.repository.CommentRepository;
 import rs.ftn.RedditCopyCat.service.CommentService;
 import rs.ftn.RedditCopyCat.service.ReactionService;
 import rs.ftn.RedditCopyCat.service.ReportService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
-import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -27,8 +27,6 @@ public class CommentServiceImpl implements CommentService {
     ReactionService reactionService;
     @Autowired
     UserService userService;
-    @Autowired
-    Principal principal;
 
     @Override
     public List<Comment> findAllForPost(Long postId, String criteria, String sortDirection) {
@@ -76,7 +74,7 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    public Comment attachComment(Post targetedPost, Long parentId, String commentText) {
+    public Comment attachComment(User creator, Post targetedPost, Long parentId, String commentText) {
         Comment madeComment = new Comment();
         madeComment.setParentComment(null);
 
@@ -90,9 +88,7 @@ public class CommentServiceImpl implements CommentService {
         madeComment.setTimestamp(LocalDate.now());
         madeComment.setText(commentText);
         madeComment.setBelongsToPost(targetedPost);
-//        TODO*: fix setBelongToUser argument, findByUsername from JWT
-//         // & call a function to check whether returned user is logged in currently in securityContext
-        madeComment.setBelongsToUser(userService.findByUsername(principal.getName()));
+        madeComment.setBelongsToUser(creator);
 
         return save(madeComment);
     }

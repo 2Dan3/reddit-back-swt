@@ -24,8 +24,8 @@ public class Community {
 
 //    @OneToOne(fetch = FetchType.LAZY)
 //    private Moderator moderator;
-
-    @ManyToMany(mappedBy = "moderatedCommunities")
+    // TODO*: check CascadeType.REMOVE
+    @ManyToMany(mappedBy = "moderatedCommunities", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE} )
     private Set<User> moderators = new HashSet<User>();
 
     @Column(name = "name", nullable = false, unique = true)

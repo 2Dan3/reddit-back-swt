@@ -116,7 +116,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                             // TODO: check HashMap - it contains old & new password
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")                                             // TODO: check HashMap - it contains old & new password
     public ResponseEntity<Void> changeOwnPassword(Principal loggedUser, @RequestBody @NotBlank HashMap<String, String> passwords) {
 //        if (password == null || "".equals(password.trim()))
         if (passwords == null || passwords.isEmpty())
@@ -134,7 +134,7 @@ public class UserController {
     }
 
     @PutMapping("/")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserDTO> changeOwnData(Principal loggedUser, @RequestBody @Validated UserDTO newData) {
         User foundUser = userService.findByUsername( ((UserDetails)loggedUser).getUsername());
 
@@ -146,7 +146,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN'")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> removeUser(@PathVariable Long id) {
         User foundUser = userService.findById(id);
         if(foundUser == null) {
