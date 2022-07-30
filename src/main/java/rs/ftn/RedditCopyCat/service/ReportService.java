@@ -22,4 +22,6 @@ public interface ReportService {
     Report findById(Long reportId);
 
     void acceptReportReason(Report existingReport);
+
+    boolean isAuthor(Long reportId, Long userId);
 }

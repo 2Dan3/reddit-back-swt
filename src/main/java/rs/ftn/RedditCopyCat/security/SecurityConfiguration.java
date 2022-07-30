@@ -55,23 +55,51 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
-        //Naglasavamo browser-u da ne cache-ira podatke koje dobije u header-ima
-        //detaljnije: https://www.baeldung.com/spring-security-cache-control-headers
+        // A note to browser not to cache data received from headers
         httpSecurity.headers().cacheControl().disable();
-        //Neophodno da ne bi proveravali autentifikaciju kod Preflight zahteva
+        // disable auth check on Preflight requests
         httpSecurity.cors();
-        //sledeca linija je neophodna iskljucivo zbog nacina na koji h2 konzola komunicira sa aplikacijom
+        // h2 console to app communication configuration
         httpSecurity.headers().frameOptions().disable();
         httpSecurity.csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/api/clubs").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/users/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/users").permitAll()
-//                .antMatchers(HttpMethod.GET, "/reddit/communities").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/clubs/{id}/**").access("@webSecurity.checkClubId(authentication,request,#id)") //TODO
+                .antMatchers(HttpMethod.POST, "/reddit/users/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/reddit/users").permitAll()
+                .antMatchers(HttpMethod.PUT, "/reddit/users/ban").access("@webSecurity.moderatesCommunity(#communityId, principal)")
+                .antMatchers(HttpMethod.PUT, "/reddit/users/unban").access("@webSecurity.moderatesCommunity(#communityId, principal)")
+                /*.antMatchers(HttpMethod.POST, "reddit/users/logout").access("@webSecurity.isUserLogged(principal)")*/
+                .antMatchers(HttpMethod.GET, "/reddit/communities").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/communities/{id}").permitAll()
+                .antMatchers(HttpMethod.PUT, "/reddit/communities").access("@webSecurity.moderatesCommunity(#communityDTO, principal)")
+                .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}").access("@webSecurity.moderatesCommunity(#communityId, principal)")
+                .antMatchers(HttpMethod.GET, "/reddit/communities{communityId}/posts").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/communities{communityId}/posts/{postId}").permitAll()
+                .antMatchers(HttpMethod.POST, "/reddit/communities{communityId}/posts").access("@webSecurity.canUserParttake(#postId, principal)")
+                .antMatchers(HttpMethod.PUT, "/reddit/communities/{communityId}/posts/{postId}").access("@webSecurity.canChangePost(#postId, principal)")
+                .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}/posts/{postId}").access("@webSecurity.canChangePost(#postId, principal)")
+                .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/flairs").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts/{postId}/flair").permitAll()
+                .antMatchers(HttpMethod.PUT, "/reddit/communities/{communityId}/posts/{postId}/flair").access("@webSecurity.canChangePost(#postId, principal)")
+                .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/flairs/{flair}").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}/flairs/{flair}").access("@webSecurity.moderatesCommunity(#communityId, principal)")
+                .antMatchers(HttpMethod.GET, "/reddit/posts/{postId}/comments").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/posts/{postId}/comments/{commentId}").permitAll()
+                .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/comments/{parentId}").access("@webSecurity.canUserParttake(#postId, principal)")
+                .antMatchers(HttpMethod.PUT, "/reddit/posts/{postId}/comments/{commentId}").access("@webSecurity.canChangeComment(#postId, #commentId, principal)")
+                .antMatchers(HttpMethod.DELETE, "/reddit/posts/{postId}/comments/{commentId}").access("@webSecurity.canChangeComment(#postId, #commentId, principal)")
+                .antMatchers(HttpMethod.PUT, "/reddit/reactions/{reactionId}").access("@webSecurity.canChangeReaction(#reactionId, principal)")
+                .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/reactions").access("@webSecurity.canReactToPost(principal, #postId)")
+                .antMatchers(HttpMethod.POST, "/reddit/comments/{commentId}/reactions").access("@webSecurity.canReactToComment(principal, #commentId)")
+                .antMatchers(HttpMethod.POST, "/reddit/communities/{communityId}/rules").access("@webSecurity.moderatesCommunity(#communityId, principal)")
+                .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}/rules/{ruleId}").access("@webSecurity.moderatesCommunity(#communityId, principal)")
+                .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/reports").access("@webSecurity.canReportPost(principal, #postId)")
+                .antMatchers(HttpMethod.POST, "/reddit/comments/{commentId}/reports").access("@webSecurity.canReportComment(principal, #commentId)")
+                .antMatchers(HttpMethod.PUT, "/reddit/reports/{reportId}").access("@webSecurity.canChangeReport(principal, #reportId)")
+                .antMatchers(HttpMethod.PUT, "/reddit/reports/{reportId}/accept").access("@webSecurity.canChangeReport(principal, #reportId)")
+
                 .anyRequest().authenticated();
 
         httpSecurity.addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);

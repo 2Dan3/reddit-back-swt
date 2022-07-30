@@ -79,4 +79,25 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
                     "to_comment_comment_id = :postId")
     Reaction findForCommentByUser(@Param("commentId") Long commentId, @Param("userId") Long userId);
 
+    @Query(nativeQuery = true, value =
+        "SELECT COUNT(r) FROM post r " +
+                "WHERE r.reaction_id = :reactionId and " +
+                "r.made_by_user_id = :userId")
+    Integer countAuthor(@Param("reactionId") Long reactionId,@Param("userId") Long userId);
+
+    @Query(nativeQuery = true, value =
+        "select count(r.*) " +
+        "from reaction r " +
+        "where " +
+            "r.to_post_post_id = :postId and " +
+            "r.made_by_user_id = :userId")
+    Integer countForPost(@Param("postId") Long postId, @Param("userId") Long userId);
+
+    @Query(nativeQuery = true, value =
+            "select count(r.*) " +
+                    "from reaction r " +
+                    "where " +
+                    "r.to_comment_comment_id = :commentId and " +
+                    "r.made_by_user_id = :userId")
+    Integer countForComment(@Param("commentId") Long commentId, @Param("userId") Long userId);
 }

@@ -2,6 +2,7 @@ package rs.ftn.RedditCopyCat.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.model.entity.Report;
@@ -61,8 +62,16 @@ public class ReportServiceImpl implements ReportService {
     public void acceptReportReason(Report existingReport) {
         existingReport.setAccepted(true);
 
-        commentService.deleteVisibility(existingReport.getForComment());
-        postService.delete(existingReport.getForPost());
+        Comment associatedComment = existingReport.getForComment();
+        if (associatedComment != null)
+            commentService.deleteVisibility(existingReport.getForComment());
+        else
+            postService.delete(existingReport.getForPost());
+    }
+
+    @Override
+    public boolean isAuthor(Long reportId, Long userId) {
+        return reportRepository.countAuthor(reportId, userId)==0?false:true;
     }
 
 }

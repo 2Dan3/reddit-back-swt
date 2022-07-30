@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "reddit/communities")
+@RequestMapping(path = "${apiPrefix}/communities")
 public class CommunityController {
 
     @Autowired
@@ -91,8 +91,7 @@ public class CommunityController {
     public ResponseEntity<CommunityDTO> updateCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
 
         // community must exist
-//        TODO  findByName mozda bolje ako ne zelim ID u DTO da se mapira sa JSON ?
-        Community community = communityService.findByName(communityDTO.getName());
+        Community community = communityService.findById(communityDTO.getId());
 
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -105,12 +104,12 @@ public class CommunityController {
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteCommunity(@PathVariable Long id) {
+    @DeleteMapping(value = "/{communityId}")
+    public ResponseEntity<Void> deleteCommunity(@PathVariable Long communityId) {
 
         // *Important: foreach in postService needs getPosts() to remove all, findById(id) here would
         // throw LazyInitializationException later on
-        Community community = communityService.findOneWithPosts(id);
+        Community community = communityService.findOneWithPosts(communityId);
 
         if (community != null) {
             communityService.remove(community);
@@ -157,9 +156,8 @@ public class CommunityController {
         return new ResponseEntity<>(new PostDTO(post), HttpStatus.OK);
     }
 
-    // TODO*: how to getLoggedUser from ReceivedJWToken for setting Reaction-author & newPost.setPostedByUser() ?
     // TODO*: how to get back ID of newPost from DB by calling postService.save(newPost) b4 the communityService.save(), without persistence errors
-    @PostMapping(value = "/{communityId}/posts")
+    @PostMapping(consumes = "application/json", value = "/{communityId}/posts")
     public ResponseEntity<Integer> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
 
         Community community = communityService.findOneWithPosts(communityId);
@@ -167,16 +165,18 @@ public class CommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+        User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername());
+
         Post newPost = new Post();
         newPost.setTitle(postSent.getTitle());
         newPost.setText(postSent.getText());
         newPost.setImagePath(postSent.getImagePath());
         newPost.setCreationDate(LocalDate.now());
         newPost.setFlair(flairService.findByName(postSent.getFlairName()));
-//TODO:        newPost.setPostedByUser(creator);
+        newPost.setPostedByUser(creator);
         community.addPost(newPost);
         communityService.save(community);
-        //TODO:        reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
+        reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -187,12 +187,12 @@ public class CommunityController {
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//            OR HttpStatus.NOT_FOUND
         }
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+
         targetedPost.setTitle(postSent.getTitle());
         targetedPost.setText(postSent.getText());
 //       TODO: poseban API -/endpoint
@@ -205,7 +205,6 @@ public class CommunityController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    //TODO *  !  !  !  *
     @GetMapping(value = "/{communityId}/flairs")
     public ResponseEntity<List<FlairDTO>> getCommunityFlairs(@PathVariable Long communityId) {
 
@@ -240,12 +239,14 @@ public class CommunityController {
         community.setSuspended(true);
         community.setSuspensionReason(communityDTO.getSuspensionReason());
 
+	// TODO*: community.removeAllModerators(); does: for User u : moderators u.getCommunities().remove(this); + this.moderators.empty or removeAll
+
         community = communityService.save(community);
+	// TODO*: saveAll(community.getModerators() ); Moze li?  ?  ? Ako ne probati sa orphanRemoval u Community na polje moderators, ali onda mozda ce raditi? . . . tj. bez for petlje kao iznad. U ovom slucaju NE SME orphanRemoval brisati i iz User maticne tabele, samo iz Moderator-a.
         return new ResponseEntity(new CommunityDTO(community), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{communityId}/posts/{postId}/flair")
-    @PreAuthorize("hasAnyRole")
     public ResponseEntity<FlairDTO> getFlairOfPost(@PathVariable Long communityId, @PathVariable Long postId) {
 //        find by ID only, no join fetch needed since flair field in Post is EAGERLY loaded
         Post containingPost = postService.findById(postId);
@@ -277,7 +278,6 @@ public class CommunityController {
     }
 
     @GetMapping(value = "/{communityId}/flairs/{flair}")
-    @PreAuthorize("hasAnyRole")
     public ResponseEntity<FlairDTO> getFlairOfCommunity(@PathVariable Long communityId, @PathVariable String flair) {
 //        comm & flair in it - must exist
         Community containingCommunity = communityService.findOneWithFlairs(communityId);

@@ -4,15 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.support.ServletContextResource;
 import rs.ftn.RedditCopyCat.model.DTO.CommentDTO;
 import rs.ftn.RedditCopyCat.model.DTO.FlairDTO;
-import rs.ftn.RedditCopyCat.model.entity.Comment;
-import rs.ftn.RedditCopyCat.model.entity.Community;
-import rs.ftn.RedditCopyCat.model.entity.Flair;
-import rs.ftn.RedditCopyCat.model.entity.Post;
+import rs.ftn.RedditCopyCat.model.entity.*;
+import rs.ftn.RedditCopyCat.model.enums.ReactionType;
 import rs.ftn.RedditCopyCat.service.CommentService;
 import rs.ftn.RedditCopyCat.service.PostService;
 import rs.ftn.RedditCopyCat.service.ReactionService;
@@ -20,12 +21,13 @@ import rs.ftn.RedditCopyCat.service.UserService;
 
 import javax.servlet.ServletContext;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "reddit/posts")
+@RequestMapping(path = "${apiPrefix}/posts")
 public class PostController {
 
     @Autowired
@@ -84,32 +86,38 @@ public class PostController {
         return new ResponseEntity<>(new CommentDTO(wantedComment), HttpStatus.OK);
     }
 
-    @PostMapping("/{postId}/comments/{parentId}")
-    public ResponseEntity<CommentDTO> makeComment(@PathVariable Long postId, @RequestBody @Validated CommentDTO receivedComment, @PathVariable Long parentId) {
+    @PostMapping(consumes = "application/json", value = "/{postId}/comments/{parentId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<CommentDTO> makeComment(Authentication authentication, @PathVariable Long postId, @RequestBody @Validated CommentDTO receivedComment, @PathVariable Long parentId) {
         Post targetedPost = postService.findById(postId);
-        if (targetedPost == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (targetedPost == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername() );
 
         Comment madeComment = commentService.attachComment(targetedPost, parentId, receivedComment.getText());
-        //TODO:        reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
+        reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));
         return new ResponseEntity<>(new CommentDTO(madeComment), HttpStatus.CREATED);
     }
 
     @PutMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentDTO> getAllReplies(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody @Validated CommentDTO receivedComment) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<CommentDTO> editOwnComment(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody @Validated CommentDTO receivedComment) {
 
         Comment targetComment = commentService.findById(commentId);
         if (postService.findById(postId) == null || targetComment == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         targetComment.setText(receivedComment.getText());
-//        targetComment.setTimestamp(LocalDate.now());
+        targetComment.setTimestamp(LocalDate.now());
         targetComment = commentService.save(targetComment);
 
         return new ResponseEntity<>(new CommentDTO(targetComment), HttpStatus.OK);
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
-    public ResponseEntity<CommentDTO> removeComment(@PathVariable Long postId, @PathVariable Long commentId) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<CommentDTO> removeOwnComment(@PathVariable Long postId, @PathVariable Long commentId) {
 
         Comment targetComment = commentService.findById(commentId);
         if (postService.findById(postId) == null || targetComment == null)
@@ -122,7 +130,8 @@ public class PostController {
     }
 
     @DeleteMapping(value = "/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> deleteOwnPost(@PathVariable Long postId) {
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -149,6 +158,7 @@ public class PostController {
     }
 
     @PutMapping(value = "/{postId}/image")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> setImageForPost(@PathVariable Long postId, @RequestBody String imagePath) {
         Post post = postService.findById(postId);
         if (post == null)

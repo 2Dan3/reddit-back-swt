@@ -121,4 +121,9 @@ public class CommentServiceImpl implements CommentService {
                 && (criteria.equals("timestamp") || criteria.equals("upvote") || criteria.equals("downvote"));
     }
 
+    @Override
+    public boolean isAuthor(Long commentId, Long userId) {
+        return commentRepository.countAuthor(commentId, userId)==0?false:true;
+    }
+
 }

@@ -20,6 +20,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findPostsSortedByDate(@Param("communityId") Long communityId,
                                      @Param("sortDir") String sortDir);
 
+    //    TODO: Return type boolean ili Integer?
+    @Query(nativeQuery = true, value =
+        "SELECT COUNT(p) FROM post p " +
+        "WHERE p.post_id = :postId and " +
+            "p.posted_by_user_user_id = :userId")
+    int countAuthor(@Param("postId") Long postId,
+                      @Param("userId") Long userId);
 
     @Query(nativeQuery = true, value =
             "select p " +
@@ -36,7 +43,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                                            @Param("sortDir") String sortDir,
                                            @Param("criteria") String criteria);
 
-    
+
     @Query(nativeQuery = true, value =
             "select p " +
             "from post p " +
@@ -50,4 +57,20 @@ public interface PostRepository extends JpaRepository<Post, Long> {
                 ":sortDir")
     List<Post> findPostsSortedByTrending(@Param("communityId") Long communityId,
                                          @Param("sortDir") String sortDir);
+
+    @Query(nativeQuery = true, value =
+        "select p.* " +
+        "from post p, reaction r " +
+        "where " +
+            "r.reaction_id = :reactionId and " +
+            "p.post_id = r.to_post_post_id")
+    Post findByReactionId(@Param("reactionId") Long reactionId);
+
+    @Query(nativeQuery = true, value =
+        "select p.* " +
+        "from post p, comment c " +
+        "where " +
+            "p.post_id = c.belongs_to_post_post_id and " +
+            "c.comment_id = :commentId")
+    Post findByCommentId(@Param("commentId") Long commentId);
 }

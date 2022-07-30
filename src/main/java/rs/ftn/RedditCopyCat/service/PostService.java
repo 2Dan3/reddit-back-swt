@@ -18,4 +18,10 @@ public interface PostService {
     List<Post> findAllFromCommunitySortedBy(Long communityId, String criteria, String sortDirection);
 
     void deleteAllPostsFromCommunity(Community c);
+
+    boolean isAuthor(Long postId, Long userId);
+
+    Post findByReactionId(Long reactionId);
+
+    Post findByCommentId(Long commentId);
 }

@@ -61,4 +61,19 @@ public class ReactionServiceImpl implements ReactionService {
     public Reaction save(Reaction reaction) {
         return reactionRepository.save(reaction);
     }
+
+    @Override
+    public boolean isAuthor(Long reactionId, Long userId) {
+        return reactionRepository.countAuthor(reactionId, userId)==0?false:true;
+    }
+
+    @Override
+    public boolean existsForPost(Long postId, User user) {
+        return reactionRepository.countForPost(postId, user.getId())==0?false:true;
+    }
+
+    @Override
+    public boolean existsForComment(Long commentId, User user) {
+        return reactionRepository.countForComment(commentId, user.getId())==0?false:true;
+    }
 }

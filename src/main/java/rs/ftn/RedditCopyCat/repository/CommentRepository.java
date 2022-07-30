@@ -48,4 +48,10 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     "delete from comment " +
             "where belongs_to_post_post_id = :postId")
     void deleteAllForPost(@Param("postId") Long postId);
+
+    @Query(nativeQuery = true, value =
+        "select count(c) from comment c " +
+        "where c.comment_id = :commentId and " +
+                "c.belongs_to_user_user_id = :userId")
+    int countAuthor(@Param("commentId") Long commentId,@Param("userId") Long userId);
 }

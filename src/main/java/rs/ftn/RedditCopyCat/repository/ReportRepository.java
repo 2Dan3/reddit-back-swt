@@ -47,4 +47,10 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
             "c.belongs_to_post_post_id = p.post_id and " +
             "p.community_id = :communityId")
     Set<Report> findForCommentsInCommunity(@Param("communityId") Long communityId);
+
+    @Query(nativeQuery = true, value =
+        "SELECT COUNT(r) FROM report r " +
+                "WHERE r.report_id = :reportId and " +
+                "r.by_user_user_id = :userId")
+    Integer countAuthor(@Param("reportId") Long reportId,@Param("userId") Long userId);
 }

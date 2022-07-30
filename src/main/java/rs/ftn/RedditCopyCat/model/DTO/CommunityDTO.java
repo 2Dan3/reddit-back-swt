@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Data
 public class CommunityDTO {
 
+    private Long id;
     @NotBlank
     private String name;
     @NotBlank
@@ -21,6 +22,7 @@ public class CommunityDTO {
     private String suspensionReason;
 
     public CommunityDTO(Community comm) {
+       this.id = comm.getId();
        this.name = comm.getName();
        this.description = comm.getDescription();
        this.creationDate = comm.getCreationDate();

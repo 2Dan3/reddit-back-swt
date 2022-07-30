@@ -3,6 +3,7 @@ package rs.ftn.RedditCopyCat.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.RuleDTO;
@@ -16,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping(value = "reddit/communities/{communityId}/rules")
+@RequestMapping(path = "${apiPrefix}/communities/{communityId}/rules")
 public class RuleController {
 
     @Autowired
@@ -39,7 +40,8 @@ public class RuleController {
         return new ResponseEntity<>(rulesDTO, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/")
+    @PostMapping(consumes = "application/json", value = "/")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<RuleDTO> createRule(@RequestBody @Validated RuleDTO ruleDTO, @PathVariable Long communityId) {
 
         // JOIN FETCH query
@@ -69,6 +71,7 @@ public class RuleController {
     }
 
     @DeleteMapping(value = "/{ruleId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> removeRule(@PathVariable Long communityId, @PathVariable Long ruleId) {
 
         Rule wantedRule = rulesService.findById(ruleId);

@@ -74,5 +74,20 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    @Override
+    public boolean isAuthor(Long postId, Long userId) {
+        return postRepository.countAuthor(postId, userId)==0?false:true;
+    }
+
+    @Override
+    public Post findByReactionId(Long reactionId) {
+        return postRepository.findByReactionId(reactionId);
+    }
+
+    @Override
+    public Post findByCommentId(Long commentId) {
+        return postRepository.findByCommentId(commentId);
+    }
+
 
 }

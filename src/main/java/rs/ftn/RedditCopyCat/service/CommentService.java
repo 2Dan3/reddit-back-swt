@@ -27,4 +27,6 @@ public interface CommentService {
     void deleteVisibility(Comment comment);
 
     boolean areSortParamsValid(String criteria, String sortDirection);
+
+    boolean isAuthor(Long commentId, Long userId);
 }

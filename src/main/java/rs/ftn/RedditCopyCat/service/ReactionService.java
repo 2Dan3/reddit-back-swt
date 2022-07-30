@@ -25,4 +25,10 @@ public interface ReactionService {
     Reaction findById(Long id);
 
     Reaction save(Reaction reaction);
+
+    boolean isAuthor(Long reactionId, Long userId);
+
+    boolean existsForPost(Long postId, User user);
+
+    boolean existsForComment(Long commentId, User user);
 }

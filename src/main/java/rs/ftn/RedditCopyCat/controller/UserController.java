@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.JwtAuthenticationRequest;
@@ -29,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@RequestMapping("reddit/users")
+@RequestMapping(path = "${apiPrefix}/users")
 public class UserController {
 
     private CommunityService communityService;
@@ -47,7 +48,7 @@ public class UserController {
         this.tokenUtils = tokenUtils;
     }
 
-    @PostMapping()
+    @PostMapping(consumes = "application/json", value = "/")
     public ResponseEntity<UserDTO> registerNewUser(@RequestBody  @Validated UserDTO newUser){
 
         User createdUser = userService.createUser(newUser);
@@ -60,26 +61,34 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
-    @PostMapping("/login")
+    @PostMapping(consumes = "application/json", value = "/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(
-            @RequestBody @Validated JwtAuthenticationRequest authenticationRequest, HttpServletResponse response) {
+            @RequestBody @Validated JwtAuthenticationRequest authRequest, HttpServletResponse response) {
 
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getUsername(), authRequest.getPassword() );
         // Ukoliko kredencijali nisu ispravni, logovanje nece biti uspesno, desice se
         // AuthenticationException
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         // Ukoliko je autentifikacija uspesna, ubaci korisnika u trenutni security
         // kontekst
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Kreiraj token za tog korisnika
-        UserDetails user = (UserDetails) authentication.getPrincipal();
-        String jwt = tokenUtils.generateToken(user);
-        int expiresIn = tokenUtils.getExpiredIn();
+//        UserDetails user = (UserDetails) authentication.getPrincipal();  ILI
+        try {
+            UserDetails user = userDetailsService.loadUserByUsername(authRequest.getUsername());
+            String jwt = tokenUtils.generateToken(user);
+            int expiresIn = tokenUtils.getExpiredIn();
 
-        // Vrati token kao odgovor na uspesnu autentifikaciju
-        return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
+            // Vrati token kao odgovor na uspesnu autentifikaciju
+            return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
+        }
+        catch (UsernameNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/all")
@@ -108,16 +117,14 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN'")                                             // TODO: check HashMap - it contains old & new password
-    public ResponseEntity<Void> changeOwnPassword(@PathVariable Long id, @RequestBody @NotBlank HashMap<String, String> passwords) {
+    public ResponseEntity<Void> changeOwnPassword(Principal loggedUser, @RequestBody @NotBlank HashMap<String, String> passwords) {
 //        if (password == null || "".equals(password.trim()))
         if (passwords == null || passwords.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        User subjectUser = this.userService.findById(id);
+        User subjectUser = userService.findByUsername(loggedUser.getName());
 
         if (subjectUser == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        if (!userService.isLoggedUser(subjectUser))
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
         boolean passwordChangeSuccessful = userService.changeOwnPassword(passwords.get("oldPass"), passwords.get("newPass"), subjectUser);
@@ -128,18 +135,18 @@ public class UserController {
 
     @PutMapping("/")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
-    public ResponseEntity<UserDTO> changeOwnData(@RequestBody @Validated UserDTO newData) {
-        User foundUser = this.userService.findById(newData.getId());
+    public ResponseEntity<UserDTO> changeOwnData(Principal loggedUser, @RequestBody @Validated UserDTO newData) {
+        User foundUser = userService.findByUsername( ((UserDetails)loggedUser).getUsername());
 
         if (foundUser == null)
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
         userService.changeOwnData(newData, foundUser);
         return new ResponseEntity<>(new UserDTO(foundUser), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN'")
+    @PreAuthorize("hasRole('ADMIN'")
     public ResponseEntity<String> removeUser(@PathVariable Long id) {
         User foundUser = userService.findById(id);
         if(foundUser == null) {
@@ -153,14 +160,10 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> banUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingBannedId, Principal principal) {
 
-//        TODO*: check this line, does it return the right logged/auth'd user ?
         User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
-        if (!userService.moderatesCommunity(communityId, moderator) ) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
         User userBeingBanned = userService.findById(userBeingBannedId);
         Community community = communityService.findById(communityId);
+
         if(userBeingBanned == null || community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -172,14 +175,9 @@ public class UserController {
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<Void> unbanUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingUnBannedId, Principal principal) {
 
-    //        TODO*: check this line, does it return the right logged/auth'd user ?
-        User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
-        if (!userService.moderatesCommunity(communityId, moderator) ) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
-
         User userBeingUnBanned = userService.findById(userBeingUnBannedId);
         Community community = communityService.findById(communityId);
+
         if(userBeingUnBanned == null || community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -187,7 +185,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/logout")
+    @PostMapping(consumes = "application/json", value = "/logout")
     public ResponseEntity<Void> invalidateToken() {
         // TODO:
         return new ResponseEntity<>(HttpStatus.OK);
