@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import rs.ftn.RedditCopyCat.model.DTO.CommunityDTO;
 import rs.ftn.RedditCopyCat.model.DTO.JwtAuthenticationRequest;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
 import rs.ftn.RedditCopyCat.model.DTO.UserTokenState;
@@ -26,11 +27,12 @@ import rs.ftn.RedditCopyCat.service.implementation.UserServiceImpl;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(path = "${apiPrefix}/users")
 public class UserController {
 
@@ -62,10 +64,11 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+//    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping(consumes = "application/json", value = "/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(
             @RequestBody @Validated JwtAuthenticationRequest authRequest, HttpServletResponse response) {
+        System.out.println("\n------------\nENTERED LOGIN\n------------\n");
 
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
@@ -86,23 +89,34 @@ public class UserController {
             int expiresIn = tokenUtils.getExpiredIn();
 
             // Vrati token kao odgovor na uspesnu autentifikaciju
-            return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
+            return new ResponseEntity<>(new UserTokenState(jwt, expiresIn), HttpStatus.OK);
         }
         catch (UsernameNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<User> loadAll() {
-        return this.userService.findAll();
+    public ResponseEntity<List<UserDTO>> loadAll() {
+        System.out.println("\n-----------\nENTERED LOADALL USERS\n-----------\n");
+
+        List<User> users = this.userService.findAll();
+
+        // convert users to userDTOs
+        List<UserDTO> usersDTO = new ArrayList<>();
+        for (User u : users) {
+            usersDTO.add(new UserDTO(u));
+        }
+
+        return new ResponseEntity<>(usersDTO, HttpStatus.OK);
     }
 
     @GetMapping("/whoami")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public User user(Principal user) {
-        return this.userService.findByUsername(user.getName());
+    public ResponseEntity<UserDTO> user(Principal user) {
+        User foundUser = this.userService.findByUsername(user.getName());
+        return new ResponseEntity<>(new UserDTO(foundUser), HttpStatus.OK);
     }
 
 

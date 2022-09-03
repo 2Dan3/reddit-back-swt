@@ -16,7 +16,9 @@ import java.security.Principal;
 //** Komponenta koja moze da obavlja dodatnu proveru zahteva pre nego sto dospe na endpoint.
 //Moguce je pristupiti @PathVariable podacima sa URL-a zahteva na endpoint, poput {id}.
 //https://docs.spring.io/spring-security/site/docs/5.2.11.RELEASE/reference/html/authorization.html
+
 @Component
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurity {
 
     @Autowired

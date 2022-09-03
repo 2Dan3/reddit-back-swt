@@ -60,10 +60,9 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Roles role;
 
-//    TODO check JPA Persistence & in Administrator Class
     @Transient
     public String getRole(){
-        return this.getClass().getAnnotation(DiscriminatorValue.class).toString();
+        return this.getClass().getAnnotation(DiscriminatorValue.class).value();
     }
 
     @Override

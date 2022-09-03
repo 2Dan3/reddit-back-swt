@@ -56,7 +56,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
         // disable auth check on Preflight requests
-        httpSecurity.cors().and();
+//        TODO* uncomment
+//        httpSecurity.cors().and();
         // A note to browser not to cache data received from headers
         httpSecurity.headers().cacheControl().disable();
 
@@ -69,6 +70,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/reddit/users/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/reddit/users/").permitAll()
+//                .antMatchers(HttpMethod.GET, "/reddit/users/all").permitAll()
                 .antMatchers(HttpMethod.PUT, "/reddit/users/ban").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/users/unban").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 /*.antMatchers(HttpMethod.POST, "reddit/users/logout").access("@webSecurity.isUserLogged(principal)")*/
