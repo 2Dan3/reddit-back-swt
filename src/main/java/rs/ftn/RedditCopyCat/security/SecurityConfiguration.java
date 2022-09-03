@@ -55,10 +55,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception{
+        // disable auth check on Preflight requests
+        httpSecurity.cors().and();
         // A note to browser not to cache data received from headers
         httpSecurity.headers().cacheControl().disable();
-        // disable auth check on Preflight requests
-        httpSecurity.cors();
+
         // h2 console to app communication configuration
         httpSecurity.headers().frameOptions().disable();
         httpSecurity.csrf().disable()
@@ -67,7 +68,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/reddit/users/login").permitAll()
-                .antMatchers(HttpMethod.POST, "/reddit/users").permitAll()
+                .antMatchers(HttpMethod.POST, "/reddit/users/").permitAll()
                 .antMatchers(HttpMethod.PUT, "/reddit/users/ban").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/users/unban").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 /*.antMatchers(HttpMethod.POST, "reddit/users/logout").access("@webSecurity.isUserLogged(principal)")*/
@@ -75,9 +76,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{id}").permitAll()
                 .antMatchers(HttpMethod.PUT, "/reddit/communities").access("@webSecurity.moderatesCommunity(#communityDTO, principal)")
                 .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}").access("@webSecurity.moderatesCommunity(#communityId, principal)")
-                .antMatchers(HttpMethod.GET, "/reddit/communities{communityId}/posts").permitAll()
-                .antMatchers(HttpMethod.GET, "/reddit/communities{communityId}/posts/{postId}").permitAll()
-                .antMatchers(HttpMethod.POST, "/reddit/communities{communityId}/posts").access("@webSecurity.canUserParttake(#postId, principal)")
+                .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts/{postId}").permitAll()
+                .antMatchers(HttpMethod.POST, "/reddit/communities/{communityId}/posts").access("@webSecurity.canUserParttake(#postId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/communities/{communityId}/posts/{postId}").access("@webSecurity.canChangePost(#postId, principal)")
                 .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}/posts/{postId}").access("@webSecurity.canChangePost(#postId, principal)")
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/flairs").permitAll()

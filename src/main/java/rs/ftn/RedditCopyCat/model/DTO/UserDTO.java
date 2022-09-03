@@ -1,13 +1,16 @@
 package rs.ftn.RedditCopyCat.model.DTO;
 
 //import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
 import rs.ftn.RedditCopyCat.model.entity.User;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
-@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class UserDTO {
 
     private Long id;

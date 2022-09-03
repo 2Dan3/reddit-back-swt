@@ -15,6 +15,7 @@ import rs.ftn.RedditCopyCat.repository.BannedRepository;
 import rs.ftn.RedditCopyCat.repository.UserRepository;
 import rs.ftn.RedditCopyCat.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(UserDTO userDTO) {
 
-        if ( !existsForUsernameOrEmail(userDTO.getUsername(), userDTO.getEmail()) ) {
+        if ( existsForUsernameOrEmail(userDTO.getUsername(), userDTO.getEmail()) ) {
             return null;
         }
 
@@ -62,6 +63,9 @@ public class UserServiceImpl implements UserService {
         newUser.setUsername(userDTO.getUsername());
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         newUser.setRole(Roles.USER);
+        newUser.setRegistrationDate(LocalDate.now());
+        newUser.setDisplayName(newUser.getUsername());
+
         newUser = userRepository.save(newUser);
 
         return newUser;

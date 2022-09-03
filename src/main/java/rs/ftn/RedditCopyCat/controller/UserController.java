@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping(path = "${apiPrefix}/users")
 public class UserController {
 
@@ -61,6 +62,7 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping(consumes = "application/json", value = "/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(
             @RequestBody @Validated JwtAuthenticationRequest authRequest, HttpServletResponse response) {
@@ -185,7 +187,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(consumes = "application/json", value = "/logout")
+    @PostMapping(value = "/logout")
     public ResponseEntity<Void> invalidateToken() {
         // TODO:
         return new ResponseEntity<>(HttpStatus.OK);
