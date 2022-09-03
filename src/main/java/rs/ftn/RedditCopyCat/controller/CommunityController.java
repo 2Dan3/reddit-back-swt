@@ -65,13 +65,15 @@ public class CommunityController {
 
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommunityDTO> createCommunity(Principal principal, @RequestBody @Validated CommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> createCommunity(Principal principal, @RequestBody @Validated CreateCommunityDTO communityDTO) {
 
         if (communityService.findByName(communityDTO.getName()) != null) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
+// TODO*
         User creator = userService.findByUsername( ((UserDetails)principal).getUsername() );
+//        User creator = userService.findByUsername(principal.getName());
 
         Community community = new Community();
         community.setName(communityDTO.getName());
