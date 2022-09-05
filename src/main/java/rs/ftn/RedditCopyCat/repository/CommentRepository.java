@@ -16,14 +16,14 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query(nativeQuery = true, value = "select c from comment c where c.belongs_to_post_post_id = :postId order by :criteria :sortDirection")
+    @Query(nativeQuery = true, value = "select c.* from comment c where c.belongs_to_post_post_id = :postId order by :criteria :sortDirection")
     List<Comment> findAllForPost(@Param("postId") Long postId, @Param("criteria") String criteria, @Param("sortDirection") String sortDirection);
 
-    @Query(nativeQuery = true, value = "select r from comment r where r.parent_comment_comment_id = :parentId order by :criteria :sortDirection")
+    @Query(nativeQuery = true, value = "select r.* from comment r where r.parent_comment_comment_id = :parentId order by :criteria :sortDirection")
     List<Comment> findRepliesTo(@Param("parentId") Long parentId, @Param("criteria") String criteria, @Param("sortDirection") String sortDirection);
 
     @Query(nativeQuery = true, value =
-            "select c " +
+            "select c.* " +
             "from comment c " +
             "where c.belongs_to_post_post_id = :postId " +
             "order by (select count(r.reaction_id) from reaction r " +
@@ -33,7 +33,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
                                            @Param("sortDirection") String sortDirection);
 
     @Query(nativeQuery = true, value =
-            "select c " +
+            "select c.* " +
             "from comment c " +
             "where c.parent_comment_comment_id = :parentId " +
             "order by (select count(r.reaction_id) from reaction r " +

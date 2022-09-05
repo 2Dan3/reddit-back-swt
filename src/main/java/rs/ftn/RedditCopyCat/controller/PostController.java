@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.support.ServletContextResource;
 import rs.ftn.RedditCopyCat.model.DTO.CommentDTO;
 import rs.ftn.RedditCopyCat.model.DTO.FlairDTO;
+import rs.ftn.RedditCopyCat.model.DTO.PostDTO;
 import rs.ftn.RedditCopyCat.model.entity.*;
 import rs.ftn.RedditCopyCat.model.enums.ReactionType;
 import rs.ftn.RedditCopyCat.service.CommentService;
@@ -123,6 +124,17 @@ public class PostController {
 
         targetComment = commentService.save(targetComment);
         return new ResponseEntity<>(new CommentDTO(targetComment), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{postId}")
+    public ResponseEntity<PostDTO> getPostById(@PathVariable Long postId) {
+
+        Post post = postService.findById(postId);
+        if (post == null) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(new PostDTO(post), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{postId}")

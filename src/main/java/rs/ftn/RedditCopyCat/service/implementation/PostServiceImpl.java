@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
     public List<Post> findAllFromCommunitySortedBy(Long communityId, String criteria, String sortDirection) {
 
         if (criteria.equalsIgnoreCase("creation_date")) {
-            return postRepository.findPostsSortedByDate(communityId, sortDirection);
+            return postRepository.findPostsSortedByDate(communityId);
         }else if (criteria.equalsIgnoreCase("trending")) {
             return postRepository.findPostsSortedByTrending(communityId, sortDirection);
         }else

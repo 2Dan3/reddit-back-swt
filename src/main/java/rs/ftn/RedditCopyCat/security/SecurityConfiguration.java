@@ -80,6 +80,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts").permitAll()
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts/{postId}").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/posts/{postId}").permitAll()
                 .antMatchers(HttpMethod.POST, "/reddit/communities/{communityId}/posts").access("@webSecurity.canUserParttake(#postId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/communities/{communityId}/posts/{postId}").access("@webSecurity.canChangePost(#postId, principal)")
                 .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}/posts/{postId}").access("@webSecurity.canChangePost(#postId, principal)")

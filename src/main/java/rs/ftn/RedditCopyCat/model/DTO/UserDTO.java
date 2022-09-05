@@ -6,6 +6,7 @@ import rs.ftn.RedditCopyCat.model.entity.User;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,6 +32,10 @@ public class UserDTO {
 
     private String description;
 
+    private LocalDate registrationDate;
+
+    private String role;
+
     public UserDTO(User createdUser) {
         this.id = createdUser.getId();
         this.username = createdUser.getUsername();
@@ -38,6 +43,9 @@ public class UserDTO {
         this.email = createdUser.getEmail();
         this.displayName = createdUser.getDisplayName() == null? this.username : createdUser.getDisplayName();
         this.description = createdUser.getDescription();
+        this.registrationDate = createdUser.getRegistrationDate();
+        this.role = createdUser.getRole();
+
     }
 
 }

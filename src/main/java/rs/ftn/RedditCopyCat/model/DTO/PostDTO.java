@@ -30,7 +30,7 @@ public class PostDTO {
         this.creationDate = post.getCreationDate();
         // TODO: check - test run it
         this.author = post.getPostedByUser().getDisplayName();
-        this.flairName = post.getFlair().getName();
+        this.flairName = post.getFlair()==null?null:post.getFlair().getName();
     }
                     /*Long id*/
     public PostDTO(String title, String author, String text, String imagePath, String flairName) {

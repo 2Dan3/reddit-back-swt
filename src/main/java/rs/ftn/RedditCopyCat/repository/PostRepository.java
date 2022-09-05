@@ -15,10 +15,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "select p.* " +
             "from post p " +
             "where p.community_id = :communityId " +
-            "order by p.creation_date " +
-            ":sortDir")
-    List<Post> findPostsSortedByDate(@Param("communityId") Long communityId,
-                                     @Param("sortDir") String sortDir);
+                "order by p.creation_date desc")
+    List<Post> findPostsSortedByDate(@Param("communityId") Long communityId);
 
     //    TODO: Return type boolean ili Integer?
     @Query(nativeQuery = true, value =
