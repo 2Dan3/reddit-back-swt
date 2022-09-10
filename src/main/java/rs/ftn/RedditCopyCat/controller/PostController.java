@@ -90,7 +90,7 @@ public class PostController {
         if (targetedPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername() );
+        User creator = userService.findByUsername(authentication.getName() );
 
         Comment madeComment = commentService.attachComment(creator, targetedPost, parentId, receivedComment.getText());
         reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));

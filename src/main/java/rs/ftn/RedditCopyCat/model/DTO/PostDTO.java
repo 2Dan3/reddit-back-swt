@@ -33,7 +33,7 @@ public class PostDTO {
         this.flairName = post.getFlair()==null?null:post.getFlair().getName();
     }
                     /*Long id*/
-    public PostDTO(String title, String author, String text, String imagePath, String flairName) {
+    public PostDTO(String title, String author, String text, LocalDate creationDate, String imagePath, String flairName) {
 //        this.id = id;
         this.title = title;
         this.author = author;
@@ -43,5 +43,6 @@ public class PostDTO {
         this.flairName = flairName;
     }
 
+    public PostDTO(){ }
 
 }

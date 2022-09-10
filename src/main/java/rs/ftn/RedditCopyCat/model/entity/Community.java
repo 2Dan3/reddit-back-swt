@@ -24,8 +24,8 @@ public class Community {
 
 //    @OneToOne(fetch = FetchType.LAZY)
 //    private Moderator moderator;
-    // TODO*: check CascadeType.REMOVE
-    @ManyToMany(mappedBy = "moderatedCommunities", cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE} )
+    // TODO*: revert it to mappedBy = "moderatedCommunities" ?
+    @ManyToMany(mappedBy = "moderatedCommunities", fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH } )
     private Set<User> moderators = new HashSet<User>();
 
     @Column(name = "name", nullable = false, unique = true)
@@ -44,7 +44,7 @@ public class Community {
     @Column
     private String suspensionReason;
 
-    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE,   CascadeType.REFRESH})
     private Set<Post> posts = new HashSet<Post>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -75,7 +75,7 @@ public class Community {
         post.setCommunity(null);
     }
     public void addModerator(User creator) {
-        moderators.add(creator);
+        this.getModerators().add(creator);
         creator.getModeratedCommunities().add(this);
     }
     public void removeModerator(User moderator) {

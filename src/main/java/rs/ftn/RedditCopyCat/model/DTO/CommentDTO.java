@@ -16,7 +16,7 @@ public class CommentDTO {
     private Long id;
     @NotBlank
     private String text;
-    @NotBlank
+//    @NotBlank
     private LocalDate timestamp;
     private Long postId;
     private String authorDisplayName;

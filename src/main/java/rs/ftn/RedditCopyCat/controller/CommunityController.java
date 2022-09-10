@@ -65,14 +65,14 @@ public class CommunityController {
 
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommunityDTO> createCommunity(Principal principal, @RequestBody @Validated CreateCommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> createCommunity(Authentication authentication, @RequestBody @Validated CreateCommunityDTO communityDTO) {
 
         if (communityService.findByName(communityDTO.getName()) != null) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
 // TODO*
-        User creator = userService.findByUsername( ((UserDetails)principal).getUsername() );
+        User creator = userService.findByUsername(authentication.getName() );
 //        User creator = userService.findByUsername(principal.getName());
 
         Community community = new Community();
@@ -167,7 +167,8 @@ public class CommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername());
+//        User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername());
+        User creator = userService.findByUsername(authentication.getName());
 
         Post newPost = new Post();
         newPost.setTitle(postSent.getTitle());
@@ -178,6 +179,7 @@ public class CommunityController {
         newPost.setPostedByUser(creator);
         community.addPost(newPost);
         communityService.save(community);
+        postService.save(newPost);
         reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
 
         return new ResponseEntity<>(HttpStatus.CREATED);
