@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -80,11 +81,11 @@ public class ReactionController {
 
     @GetMapping("/posts/{postId}/reaction")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> getCurrentUserReactionToPost(Principal principal, @PathVariable Long postId) {
+    public ResponseEntity<ReactionDTO> getCurrentUserReactionToPost(Authentication authentication, @PathVariable Long postId) {
         if (postService.findById(postId) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User currentUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        User currentUser = userService.findByUsername(authentication.getName());
 
         Reaction userReaction = reactionService.findForPostByUser(postId, currentUser.getId());
         if (userReaction == null)
@@ -95,11 +96,11 @@ public class ReactionController {
 
     @GetMapping("/comments/{commentId}/reaction")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> getCurrentUserReactionToComment(Principal principal, @PathVariable Long commentId) {
+    public ResponseEntity<ReactionDTO> getCurrentUserReactionToComment(Authentication authentication, @PathVariable Long commentId) {
         if (commentService.findById(commentId) == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User currentUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        User currentUser = userService.findByUsername(authentication.getName());
 
         Reaction userReaction = reactionService.findForCommentByUser(commentId, currentUser.getId());
         if (userReaction == null)
@@ -128,13 +129,13 @@ public class ReactionController {
     @PostMapping(consumes = "application/json",
                 value = "/posts/{postId}/reactions")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> reactToPost(Principal principal, @PathVariable Long postId, @RequestBody @Validated ReactionDTO receivedReaction) {
+    public ResponseEntity<ReactionDTO> reactToPost(Authentication authentication, @PathVariable Long postId, @RequestBody @Validated ReactionDTO receivedReaction) {
 
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User currentUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        User currentUser = userService.findByUsername(authentication.getName());
 
         Reaction newReaction = new Reaction();
         newReaction.setType(receivedReaction.getType());
@@ -148,13 +149,13 @@ public class ReactionController {
 
     @PostMapping(consumes = "application/json", value = "/comments/{commentId}/reactions")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> reactToComment(Principal principal, @PathVariable Long commentId, @RequestBody @Validated ReactionDTO receivedReaction) {
+    public ResponseEntity<ReactionDTO> reactToComment(Authentication authentication, @PathVariable Long commentId, @RequestBody @Validated ReactionDTO receivedReaction) {
 
         Comment targetedComment = commentService.findById(commentId);
         if (targetedComment == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User currentUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        User currentUser = userService.findByUsername(authentication.getName());
 
         Reaction newReaction = new Reaction();
         newReaction.setType(receivedReaction.getType());

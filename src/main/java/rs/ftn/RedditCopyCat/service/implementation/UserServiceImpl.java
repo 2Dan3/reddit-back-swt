@@ -159,4 +159,9 @@ public class UserServiceImpl implements UserService {
         return bannedRepository.existsBan(user.getId(), community.getId()) == 0?false:true;
     }
 
+    @Override
+    public User save(User user) {
+        return this.userRepository.save(user);
+    }
+
 }

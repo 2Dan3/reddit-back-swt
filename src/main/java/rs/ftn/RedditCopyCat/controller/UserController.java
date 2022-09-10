@@ -114,7 +114,7 @@ public class UserController {
 
     @GetMapping("/whoami")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> user(Principal user) {
+    public ResponseEntity<UserDTO> user(Authentication user) {
         User foundUser = this.userService.findByUsername(user.getName());
         return new ResponseEntity<>(new UserDTO(foundUser), HttpStatus.OK);
     }
@@ -131,9 +131,9 @@ public class UserController {
         return new ResponseEntity<UserDTO>(new UserDTO(foundUser), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")                                             // TODO: check HashMap - it contains old & new password
-    public ResponseEntity<Void> changeOwnPassword(Principal loggedUser, @RequestBody @NotBlank HashMap<String, String> passwords) {
+    @PutMapping("/")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> changeOwnPassword(Authentication loggedUser, @RequestBody @NotBlank HashMap<String, String> passwords) {
 //        if (password == null || "".equals(password.trim()))
         if (passwords == null || passwords.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -151,8 +151,8 @@ public class UserController {
 
     @PutMapping("/")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> changeOwnData(Principal loggedUser, @RequestBody @Validated UserDTO newData) {
-        User foundUser = userService.findByUsername( ((UserDetails)loggedUser).getUsername());
+    public ResponseEntity<UserDTO> changeOwnData(Authentication loggedUser, @RequestBody @Validated UserDTO newData) {
+        User foundUser = userService.findByUsername(loggedUser.getName() );
 
         if (foundUser == null)
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -174,9 +174,9 @@ public class UserController {
 
     @PutMapping("/ban")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Void> banUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingBannedId, Principal principal) {
+    public ResponseEntity<Void> banUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingBannedId, Authentication authentication) {
 
-        User moderator = userService.findByUsername( ((UserDetails)principal).getUsername() );
+        User moderator = userService.findByUsername(authentication.getName());
         User userBeingBanned = userService.findById(userBeingBannedId);
         Community community = communityService.findById(communityId);
 
@@ -189,7 +189,7 @@ public class UserController {
 
     @PutMapping("/unban")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Void> unbanUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingUnBannedId, Principal principal) {
+    public ResponseEntity<Void> unbanUserFromCommunity(@RequestParam Long communityId, @RequestParam Long userBeingUnBannedId, Authentication authentication) {
 
         User userBeingUnBanned = userService.findById(userBeingUnBannedId);
         Community community = communityService.findById(communityId);

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -56,12 +57,12 @@ public class ReportController {
 
     @PostMapping(consumes = "application/json", value = "/posts/{postId}/reports")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReportDTO> makeReportToPost(Principal principal, @PathVariable Long postId, @RequestBody @Validated ReportDTO receivedReport) {
+    public ResponseEntity<ReportDTO> makeReportToPost(Authentication authentication, @PathVariable Long postId, @RequestBody @Validated ReportDTO receivedReport) {
         Post foundPost = postService.findById(postId);
         if (foundPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        User loggedUser = userService.findByUsername(authentication.getName());
 
         Report newReport = new Report();
         newReport.setAccepted(false);
@@ -76,12 +77,12 @@ public class ReportController {
 
     @PostMapping(consumes = "application/json", value = "/comments/{commentId}/reports")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReportDTO> makeReportToComment(Principal principal, @PathVariable Long commentId, @RequestBody @Validated ReportDTO receivedReport) {
+    public ResponseEntity<ReportDTO> makeReportToComment(Authentication authentication, @PathVariable Long commentId, @RequestBody @Validated ReportDTO receivedReport) {
         Comment foundComment = commentService.findById(commentId);
         if (foundComment == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        User loggedUser = userService.findByUsername(authentication.getName());
 
         Report newReport = new Report();
         newReport.setAccepted(false);

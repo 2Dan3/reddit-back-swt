@@ -81,7 +81,7 @@ public class CommunityController {
         community.setCreationDate(LocalDate.now());
         community.setSuspended(false);
         community.addModerator(creator);
-
+        userService.save(creator);
         community = communityService.save(community);
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.CREATED);
     }
@@ -167,7 +167,6 @@ public class CommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-//        User creator = userService.findByUsername( ((UserDetails)authentication.getPrincipal()).getUsername());
         User creator = userService.findByUsername(authentication.getName());
 
         Post newPost = new Post();
