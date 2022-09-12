@@ -19,10 +19,10 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
 
     Optional<Community> findFirstByName(String name);
 
-    @Query("select c from Community c join fetch c.posts p where c.id =?1")
+    @Query("select c from Community c left join fetch c.posts p where c.id =?1")
     Community findOneWithPosts(Long communityId);
 
 //    TODO: Query - test run it
-    @Query("select c from Community c join fetch c.flairs f where c.id =?1")
+    @Query("select c from Community c left join fetch c.flairs f where c.id =?1")
     Community findOneWithFlairs(Long communityId);
 }

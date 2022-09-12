@@ -24,8 +24,7 @@ public class Community {
 
 //    @OneToOne(fetch = FetchType.LAZY)
 //    private Moderator moderator;
-    // TODO*: revert it to mappedBy = "moderatedCommunities" ?
-    @ManyToMany(mappedBy = "moderatedCommunities", fetch = FetchType.EAGER, cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH } )
+    @ManyToMany(mappedBy = "moderatedCommunities", fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH } )
     private Set<User> moderators = new HashSet<User>();
 
     @Column(name = "name", nullable = false, unique = true)
@@ -44,7 +43,7 @@ public class Community {
     @Column
     private String suspensionReason;
 
-    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE,   CascadeType.REFRESH})
+    @OneToMany(mappedBy = "community", fetch = FetchType.LAZY, cascade = {CascadeType.REMOVE,   CascadeType.REFRESH})
     private Set<Post> posts = new HashSet<Post>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -59,9 +58,9 @@ public class Community {
 
     // Bidirectional Field Synchronizer - ADD- / REMOVE- child
     public void addFlair(Flair flair) {
-        flairs.add(flair);
         flair.getCommunities().add(this);
-    }
+        flairs.add(flair);
+        }
     public void removeFlair(Flair flair) {
         flairs.remove(flair);
         flair.getCommunities().remove(this);

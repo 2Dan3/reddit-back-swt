@@ -149,7 +149,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/")
+    @PutMapping("/edit")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public ResponseEntity<UserDTO> changeOwnData(Authentication loggedUser, @RequestBody @Validated UserDTO newData) {
         User foundUser = userService.findByUsername(loggedUser.getName() );

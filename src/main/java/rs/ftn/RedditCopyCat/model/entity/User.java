@@ -47,7 +47,7 @@ public class User implements Serializable {
 //    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    private Set<Moderator> moderators = new HashSet<Moderator>();
 
-    @ManyToMany( cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.DETACH }, fetch = FetchType.EAGER )
+    @ManyToMany( cascade = {CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH }, fetch = FetchType.EAGER )
     @JoinTable(
             name = "moderator",
             joinColumns = @JoinColumn(name = "u_id", referencedColumnName = "user_id"),

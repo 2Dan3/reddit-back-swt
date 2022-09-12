@@ -67,15 +67,17 @@ public class ReactionController {
         return new ResponseEntity<>(reactionsDTO, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/users/{userId}/karma")
+    @GetMapping(value = "/users/karma")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Integer> getUserKarmaPoints(@PathVariable Long userId) {
-        User user = userService.findById(userId);
-        if (user == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Integer> getUserKarmaPoints(Authentication authentication) {
+        User loggedUser = userService.findByUsername(authentication.getName());
+        if (loggedUser == null)
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
-        Integer karmaPoints = reactionService.getTotalKarmaPoints(user);
-//        TODO query
+        Integer karmaPoints = reactionService.getTotalKarmaPoints(loggedUser);
+        if (karmaPoints == null) {
+            karmaPoints = 0;
+        }
         return new ResponseEntity<>(karmaPoints, HttpStatus.OK);
     }
 

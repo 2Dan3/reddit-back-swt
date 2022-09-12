@@ -57,7 +57,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception{
         // disable auth check on Preflight requests
 //        TODO* uncomment
-//        httpSecurity.cors().and();
+        httpSecurity.cors().and();
         // A note to browser not to cache data received from headers
         httpSecurity.headers().cacheControl().disable();
 

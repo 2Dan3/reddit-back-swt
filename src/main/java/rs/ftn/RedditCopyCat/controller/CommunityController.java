@@ -71,9 +71,7 @@ public class CommunityController {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
         }
 
-// TODO*
         User creator = userService.findByUsername(authentication.getName() );
-//        User creator = userService.findByUsername(principal.getName());
 
         Community community = new Community();
         community.setName(communityDTO.getName());
@@ -81,8 +79,8 @@ public class CommunityController {
         community.setCreationDate(LocalDate.now());
         community.setSuspended(false);
         community.addModerator(creator);
-        userService.save(creator);
         community = communityService.save(community);
+//        userService.save(creator);
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.CREATED);
     }
 
