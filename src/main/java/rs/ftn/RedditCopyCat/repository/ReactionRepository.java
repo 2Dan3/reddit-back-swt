@@ -40,15 +40,15 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
 
 
     @Query(nativeQuery = true, value =
-        "select sum(r.type='UPVOTE') - sum(r.type='DOWNVOTE') " +
+        "select (select sum(r.type='UPVOTE') - sum(r.type='DOWNVOTE') " +
                 "from post p, reaction r " +
                 "where p.user_id = :userId and " +
-                "r.to_post_post_id = p.post_id " +
-                "union " +
-                "select sum(r.type='UPVOTE') - sum(r.type='DOWNVOTE') " +
+                "r.to_post_post_id = p.post_id)" +
+                "+ " +
+                "(select sum(r.type='UPVOTE') - sum(r.type='DOWNVOTE') " +
                 "from comment c, reaction r " +
                 "where c.belongs_to_user_user_id = :userId and " +
-                "r.to_comment_comment_id = c.comment_id limit 1")
+                "r.to_comment_comment_id = c.comment_id) as karmaPoints")
     Integer getTotalKarmaForUserId(@Param("userId") Long userId);
 
     @Query(nativeQuery = true, value =
