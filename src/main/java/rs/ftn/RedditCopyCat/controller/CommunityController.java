@@ -155,10 +155,9 @@ public class CommunityController {
         return new ResponseEntity<>(new PostDTO(post), HttpStatus.OK);
     }
 
-    // TODO*: how to get back ID of newPost from DB by calling postService.save(newPost) b4 the communityService.save(), without persistence errors
     @PostMapping(consumes = "application/json", value = "/{communityId}/posts")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Integer> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
+    public ResponseEntity<PostDTO> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
@@ -176,10 +175,10 @@ public class CommunityController {
         newPost.setPostedByUser(creator);
         community.addPost(newPost);
         communityService.save(community);
-        postService.save(newPost);
+        Post savedPost = postService.save(newPost);
         reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(new PostDTO(savedPost), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{communityId}/posts/{postId}")

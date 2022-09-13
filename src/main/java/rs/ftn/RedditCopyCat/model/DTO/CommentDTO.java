@@ -1,6 +1,7 @@
 package rs.ftn.RedditCopyCat.model.DTO;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
@@ -9,6 +10,7 @@ import rs.ftn.RedditCopyCat.model.entity.User;
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
+@NoArgsConstructor
 @Getter
 @Setter
 public class CommentDTO {
