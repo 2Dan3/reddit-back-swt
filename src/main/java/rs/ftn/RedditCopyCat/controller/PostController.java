@@ -84,7 +84,7 @@ public class PostController {
 
     @PostMapping(consumes = "application/json", value = "/{postId}/comments/{parentId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommentDTO> makeComment(Authentication authentication, @PathVariable Long postId, @Valid @RequestBody CommentDTO receivedComment, @PathVariable Long parentId) {
+    public ResponseEntity<CommentDTO> makeReply(Authentication authentication, @PathVariable Long postId, @Valid @RequestBody CommentDTO receivedComment, @PathVariable Long parentId) {
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -92,6 +92,20 @@ public class PostController {
         User creator = userService.findByUsername(authentication.getName() );
 
         Comment madeComment = commentService.attachComment(creator, targetedPost, parentId, receivedComment.getText());
+        reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));
+        return new ResponseEntity<>(new CommentDTO(madeComment, reactionService.getKarmaForComment(madeComment.getId())), HttpStatus.CREATED);
+    }
+
+    @PostMapping(consumes = "application/json", value = "/{postId}/comments")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<CommentDTO> makeIndependentComment(Authentication authentication, @PathVariable Long postId, @Valid @RequestBody CommentDTO receivedComment) {
+        Post targetedPost = postService.findById(postId);
+        if (targetedPost == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        User creator = userService.findByUsername(authentication.getName() );
+
+        Comment madeComment = commentService.attachComment(creator, targetedPost, null, receivedComment.getText());
         reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));
         return new ResponseEntity<>(new CommentDTO(madeComment, reactionService.getKarmaForComment(madeComment.getId())), HttpStatus.CREATED);
     }

@@ -92,6 +92,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/reddit/posts/{postId}/comments").permitAll()
                 .antMatchers(HttpMethod.GET, "/reddit/posts/{postId}/comments/{commentId}").permitAll()
 // TODO* uncomment              .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/comments/{parentId}").access("@webSecurity.canUserParttake(#postId, principal)")
+// TODO* uncomment              .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/comments").access("@webSecurity.canUserParttake(#postId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/posts/{postId}/comments/{commentId}").access("@webSecurity.canChangeComment(#postId, #commentId, principal)")
                 .antMatchers(HttpMethod.DELETE, "/reddit/posts/{postId}/comments/{commentId}").access("@webSecurity.canChangeComment(#postId, #commentId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/reactions/{reactionId}").access("@webSecurity.canChangeReaction(#reactionId, principal)")
