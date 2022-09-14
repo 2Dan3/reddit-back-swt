@@ -64,7 +64,7 @@ public class PostController {
 
         List<CommentDTO> commentsDTO = new ArrayList<>();
         for (Comment c : resultComments) {
-            commentsDTO.add(new CommentDTO(c));
+            commentsDTO.add(new CommentDTO(c, reactionService.getKarmaForComment(c.getId())));
         }
         return new ResponseEntity<>(commentsDTO, HttpStatus.OK);
     }
@@ -80,7 +80,7 @@ public class PostController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(new CommentDTO(wantedComment), HttpStatus.OK);
+        return new ResponseEntity<>(new CommentDTO(wantedComment, reactionService.getKarmaForComment(wantedComment.getId())), HttpStatus.OK);
     }
 
     @PostMapping(consumes = "application/json", value = "/{postId}/comments/{parentId}")
@@ -94,7 +94,7 @@ public class PostController {
 
         Comment madeComment = commentService.attachComment(creator, targetedPost, parentId, receivedComment.getText());
         reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));
-        return new ResponseEntity<>(new CommentDTO(madeComment), HttpStatus.CREATED);
+        return new ResponseEntity<>(new CommentDTO(madeComment, reactionService.getKarmaForComment(madeComment.getId())), HttpStatus.CREATED);
     }
 
     @PutMapping("/{postId}/comments/{commentId}")
@@ -109,7 +109,7 @@ public class PostController {
         targetComment.setTimestamp(LocalDate.now());
         targetComment = commentService.save(targetComment);
 
-        return new ResponseEntity<>(new CommentDTO(targetComment), HttpStatus.OK);
+        return new ResponseEntity<>(new CommentDTO(targetComment, reactionService.getKarmaForComment(targetComment.getId())), HttpStatus.OK);
     }
 
     @DeleteMapping("/{postId}/comments/{commentId}")
@@ -134,7 +134,7 @@ public class PostController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(new PostDTO(post), HttpStatus.OK);
+        return new ResponseEntity<>(new PostDTO(post, reactionService.getKarmaForPost(post.getId())), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{postId}")

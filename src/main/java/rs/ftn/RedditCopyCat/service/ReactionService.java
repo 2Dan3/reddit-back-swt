@@ -31,4 +31,8 @@ public interface ReactionService {
     boolean existsForPost(Long postId, User user);
 
     boolean existsForComment(Long commentId, User user);
+
+    Integer getKarmaForComment(Long id);
+
+    Integer getKarmaForPost(Long id);
 }

@@ -52,7 +52,7 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
     Integer getTotalKarmaForUserId(@Param("userId") Long userId);
 
     @Query(nativeQuery = true, value =
-        "select * from reaction" +
+        "select * from reaction " +
                 "where made_by_user_id = :userId and " +
                     "to_post_post_id = :postId")
     Reaction findForPostByUser(@Param("postId") Long postId, @Param("userId") Long userId);
@@ -84,4 +84,16 @@ public interface ReactionRepository extends JpaRepository<Reaction, Long> {
                     "r.to_comment_comment_id = :commentId and " +
                     "r.made_by_user_id = :userId")
     Integer countForComment(@Param("commentId") Long commentId, @Param("userId") Long userId);
+
+    @Query(nativeQuery = true, value =
+        "select sum(r.type = 'UPVOTE') - sum(r.type = 'DOWNVOTE') " +
+                "from reaction r " +
+                "where r.to_comment_comment_id = :commentId")
+    Integer getKarmaForComment(@Param("commentId") Long commentId);
+
+    @Query(nativeQuery = true, value =
+        "select sum(r.type = 'UPVOTE') - sum(r.type = 'DOWNVOTE') " +
+                "from reaction r " +
+                "where r.to_post_post_id = :postId")
+    Integer getKarmaForPost(@Param("postId") Long postId);
 }

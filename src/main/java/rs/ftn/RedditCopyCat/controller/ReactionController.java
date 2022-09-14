@@ -111,22 +111,21 @@ public class ReactionController {
         return new ResponseEntity<>(new ReactionDTO(userReaction), HttpStatus.OK);
     }
 
-//    *TODO: URL-PATH: w/ or w/o PathVariable (which needs to be visible for WebSecurity pre-checks) ?
-    @PutMapping("/reactions/{reactionId}")
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> changeOwnReaction(@RequestBody @Validated ReactionDTO receivedReaction, @PathVariable Long reactionId) {
-
-        Reaction existingReaction = reactionService.findById(reactionId);
-//        Reaction existingReaction = reactionService.findById(receivedReaction.getId());
-        if (existingReaction == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        existingReaction.setType(receivedReaction.getType());
-        existingReaction.setTimestamp(LocalDate.now());
-
-        existingReaction = reactionService.save(existingReaction);
-        return new ResponseEntity<>(new ReactionDTO(existingReaction), HttpStatus.OK);
-    }
+//    @PutMapping("/reactions/{reactionId}")
+//    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//    public ResponseEntity<ReactionDTO> changeOwnReaction(@RequestBody @Validated ReactionDTO receivedReaction, @PathVariable Long reactionId) {
+//
+//        Reaction existingReaction = reactionService.findById(reactionId);
+////        Reaction existingReaction = reactionService.findById(receivedReaction.getId());
+//        if (existingReaction == null)
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//
+//        existingReaction.setType(receivedReaction.getType());
+//        existingReaction.setTimestamp(LocalDate.now());
+//
+//        existingReaction = reactionService.save(existingReaction);
+//        return new ResponseEntity<>(new ReactionDTO(existingReaction), HttpStatus.OK);
+//    }
 
     @PostMapping(consumes = "application/json",
                 value = "/posts/{postId}/reactions")
@@ -139,14 +138,24 @@ public class ReactionController {
 
         User currentUser = userService.findByUsername(authentication.getName());
 
-        Reaction newReaction = new Reaction();
-        newReaction.setType(receivedReaction.getType());
-        newReaction.setToPost(targetedPost);
-        newReaction.setMadeBy(currentUser);
-        newReaction.setTimestamp(LocalDate.now());
+        Reaction existingReaction = reactionService.findForPostByUser(postId, currentUser.getId());
+        if (existingReaction == null) {
+            Reaction newReaction = new Reaction();
+            newReaction.setType(receivedReaction.getType());
+            newReaction.setToPost(targetedPost);
+            newReaction.setMadeBy(currentUser);
+            newReaction.setTimestamp(LocalDate.now());
 
-        newReaction = reactionService.save(newReaction);
-        return new ResponseEntity<>(new ReactionDTO(newReaction), HttpStatus.CREATED);
+            newReaction = reactionService.save(newReaction);
+            return new ResponseEntity<>(new ReactionDTO(newReaction), HttpStatus.CREATED);
+        }else {
+            if (existingReaction.getType() == receivedReaction.getType())
+                return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
+            existingReaction.setType(receivedReaction.getType());
+            existingReaction = reactionService.save(existingReaction);
+            return new ResponseEntity<>(new ReactionDTO(existingReaction), HttpStatus.CREATED);
+        }
     }
 
     @PostMapping(consumes = "application/json", value = "/comments/{commentId}/reactions")
@@ -159,13 +168,40 @@ public class ReactionController {
 
         User currentUser = userService.findByUsername(authentication.getName());
 
-        Reaction newReaction = new Reaction();
-        newReaction.setType(receivedReaction.getType());
-        newReaction.setToComment(targetedComment);
-        newReaction.setMadeBy(currentUser);
-        newReaction.setTimestamp(LocalDate.now());
+        Reaction existingReaction = reactionService.findForCommentByUser(commentId, currentUser.getId());
+        if (existingReaction == null) {
+            Reaction newReaction = new Reaction();
+            newReaction.setType(receivedReaction.getType());
+            newReaction.setToComment(targetedComment);
+            newReaction.setMadeBy(currentUser);
+            newReaction.setTimestamp(LocalDate.now());
 
-        newReaction = reactionService.save(newReaction);
-        return new ResponseEntity<>(new ReactionDTO(newReaction), HttpStatus.CREATED);
+            newReaction = reactionService.save(newReaction);
+            return new ResponseEntity<>(new ReactionDTO(newReaction), HttpStatus.CREATED);
+        } else {
+            if (existingReaction.getType() == receivedReaction.getType())
+                return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
+            existingReaction.setType(receivedReaction.getType());
+            existingReaction = reactionService.save(existingReaction);
+            return new ResponseEntity<>(new ReactionDTO(existingReaction), HttpStatus.CREATED);
+        }
     }
+
+    @GetMapping("/comments/{commentId}/karma")
+    public ResponseEntity<Integer> getCommentTotalKarma(@PathVariable Long commentId) {
+        if(commentService.findById(commentId) == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(reactionService.getKarmaForComment(commentId), HttpStatus.OK);
+    }
+
+    @GetMapping("/posts/{postId}/karma")
+    public ResponseEntity<Integer> getPostTotalKarma(@PathVariable Long postId) {
+        if(postService.findById(postId) == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(reactionService.getKarmaForPost(postId), HttpStatus.OK);
+    }
+
 }

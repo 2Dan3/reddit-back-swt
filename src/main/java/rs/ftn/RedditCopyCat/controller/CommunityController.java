@@ -134,7 +134,7 @@ public class CommunityController {
         List<PostDTO> postsDTO = new ArrayList<>();
 
         for (Post p : posts) {
-            PostDTO postDTO = new PostDTO(p);
+            PostDTO postDTO = new PostDTO(p, reactionService.getKarmaForPost(p.getId()));
             postsDTO.add(postDTO);
         }
         return new ResponseEntity<>(postsDTO, HttpStatus.OK);
@@ -152,7 +152,7 @@ public class CommunityController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
 
-        return new ResponseEntity<>(new PostDTO(post), HttpStatus.OK);
+        return new ResponseEntity<>(new PostDTO(post, reactionService.getKarmaForPost(post.getId())), HttpStatus.OK);
     }
 
     @PostMapping(consumes = "application/json", value = "/{communityId}/posts")
@@ -178,7 +178,7 @@ public class CommunityController {
         Post savedPost = postService.save(newPost);
         reactionService.save(new Reaction(ReactionType.UPVOTE, newPost, null, creator));
 
-        return new ResponseEntity<>(new PostDTO(savedPost), HttpStatus.CREATED);
+        return new ResponseEntity<>(new PostDTO(savedPost, reactionService.getKarmaForPost(savedPost.getId())), HttpStatus.CREATED);
     }
 
     @PutMapping(value = "/{communityId}/posts/{postId}")

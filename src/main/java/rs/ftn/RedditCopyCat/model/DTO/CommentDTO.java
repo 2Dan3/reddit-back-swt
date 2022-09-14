@@ -3,9 +3,11 @@ package rs.ftn.RedditCopyCat.model.DTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.model.entity.User;
+import rs.ftn.RedditCopyCat.service.ReactionService;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
@@ -15,6 +17,9 @@ import java.time.LocalDate;
 @Setter
 public class CommentDTO {
 
+    @Autowired
+    private ReactionService reactionService;
+
     private Long id;
     @NotBlank
     private String text;
@@ -23,6 +28,7 @@ public class CommentDTO {
     private Long postId;
     private String authorDisplayName;
 //    private Long parentCommentId;
+    private Integer karmaPoints;
 
     public CommentDTO(Comment c) {
         this.id = c.getId();
@@ -39,5 +45,15 @@ public class CommentDTO {
         this.timestamp = timestamp;
         this.postId = postId;
         this.authorDisplayName = authorDisplayName;
+    }
+
+    public CommentDTO(Comment c, Integer karmaForComment) {
+        this.id = c.getId();
+        this.text = c.getText();
+        this.timestamp = c.getTimestamp();
+        this.postId = c.getBelongsToPost().getId();
+        this.authorDisplayName = c.getBelongsToUser().getDisplayName();
+//        this.parentCommentId = c.getParentComment().getId();
+        this.karmaPoints = karmaForComment;
     }
 }

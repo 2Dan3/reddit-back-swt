@@ -3,7 +3,10 @@ package rs.ftn.RedditCopyCat.model.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import rs.ftn.RedditCopyCat.model.entity.Post;
+import rs.ftn.RedditCopyCat.service.ReactionService;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
@@ -11,6 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class PostDTO {
+
     private Long id;
     @NotBlank
     private String title;
@@ -21,6 +25,7 @@ public class PostDTO {
     private String imagePath;
     private String flairName;
 //    private Long communityId;
+    private Integer karmaPoints;
 
     public PostDTO(Post post) {
         this.id = post.getId();
@@ -28,7 +33,6 @@ public class PostDTO {
         this.text = post.getText();
         this.imagePath = post.getImagePath();
         this.creationDate = post.getCreationDate();
-        // TODO: check - test run it
         this.author = post.getPostedByUser().getDisplayName();
         this.flairName = post.getFlair()==null?null:post.getFlair().getName();
     }
@@ -45,4 +49,14 @@ public class PostDTO {
 
     public PostDTO(){ }
 
+    public PostDTO(Post post, Integer karmaForPost) {
+        this.id = post.getId();
+        this.title = post.getTitle();
+        this.text = post.getText();
+        this.imagePath = post.getImagePath();
+        this.creationDate = post.getCreationDate();
+        this.author = post.getPostedByUser().getDisplayName();
+        this.flairName = post.getFlair()==null?null:post.getFlair().getName();
+        this.karmaPoints = karmaForPost;
+    }
 }

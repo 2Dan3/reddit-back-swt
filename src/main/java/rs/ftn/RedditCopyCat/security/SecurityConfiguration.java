@@ -95,14 +95,16 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.PUT, "/reddit/posts/{postId}/comments/{commentId}").access("@webSecurity.canChangeComment(#postId, #commentId, principal)")
                 .antMatchers(HttpMethod.DELETE, "/reddit/posts/{postId}/comments/{commentId}").access("@webSecurity.canChangeComment(#postId, #commentId, principal)")
                 .antMatchers(HttpMethod.PUT, "/reddit/reactions/{reactionId}").access("@webSecurity.canChangeReaction(#reactionId, principal)")
-                .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/reactions").access("@webSecurity.canReactToPost(principal, #postId)")
-                .antMatchers(HttpMethod.POST, "/reddit/comments/{commentId}/reactions").access("@webSecurity.canReactToComment(principal, #commentId)")
+// TODO* uncomment                .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/reactions").access("@webSecurity.canReactToPost(principal, #postId)")
+// TODO* uncomment              .antMatchers(HttpMethod.POST, "/reddit/comments/{commentId}/reactions").access("@webSecurity.canReactToComment(principal, #commentId)")
                 .antMatchers(HttpMethod.POST, "/reddit/communities/{communityId}/rules").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}/rules/{ruleId}").access("@webSecurity.moderatesCommunity(#communityId, principal)")
                 .antMatchers(HttpMethod.POST, "/reddit/posts/{postId}/reports").access("@webSecurity.canReportPost(principal, #postId)")
                 .antMatchers(HttpMethod.POST, "/reddit/comments/{commentId}/reports").access("@webSecurity.canReportComment(principal, #commentId)")
                 .antMatchers(HttpMethod.PUT, "/reddit/reports/{reportId}").access("@webSecurity.canChangeReport(principal, #reportId)")
                 .antMatchers(HttpMethod.PUT, "/reddit/reports/{reportId}/accept").access("@webSecurity.canChangeReport(principal, #reportId)")
+                .antMatchers(HttpMethod.GET, "/reddit/comments/{commentId}/karma").permitAll()
+                .antMatchers(HttpMethod.GET, "/reddit/posts/{postId}/karma").permitAll()
 
                 .anyRequest().authenticated();
 

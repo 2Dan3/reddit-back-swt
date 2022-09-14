@@ -76,4 +76,14 @@ public class ReactionServiceImpl implements ReactionService {
     public boolean existsForComment(Long commentId, User user) {
         return reactionRepository.countForComment(commentId, user.getId())==0?false:true;
     }
+
+    @Override
+    public Integer getKarmaForComment(Long commentId) {
+        return reactionRepository.getKarmaForComment(commentId);
+    }
+
+    @Override
+    public Integer getKarmaForPost(Long postId) {
+        return reactionRepository.getKarmaForPost(postId);
+    }
 }

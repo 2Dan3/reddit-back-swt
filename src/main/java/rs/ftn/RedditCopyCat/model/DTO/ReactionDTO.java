@@ -2,6 +2,7 @@ package rs.ftn.RedditCopyCat.model.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.GetMapping;
 import rs.ftn.RedditCopyCat.model.entity.Reaction;
@@ -14,17 +15,18 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class ReactionDTO {
     private Long id;
     @NotBlank(message = "Reaction type required!")
     private ReactionType type;
     private LocalDate timestamp;
-//    private Long authorId;
+    private Long authorId;
 
     public ReactionDTO(Reaction r) {
         this.id = r.getId();
         this.type = r.getType();
         this.timestamp = r.getTimestamp();
-//        this.authorId = r.getMadeBy().getId();
+        this.authorId = r.getMadeBy().getId();
     }
 }
