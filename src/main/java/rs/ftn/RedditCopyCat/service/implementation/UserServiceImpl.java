@@ -24,8 +24,6 @@ public class UserServiceImpl implements UserService {
 
     private BannedRepository bannedRepository;
     private UserRepository userRepository;
-//    @Autowired
-//    private Principal principal;
 
     private PasswordEncoder passwordEncoder;
 
@@ -36,11 +34,6 @@ public class UserServiceImpl implements UserService {
         this.bannedRepository = bannedRepository;
         this.userRepository = userRepository;
     }
-
-//    @Autowired
-//    public void setPasswordEncoder(PasswordEncoder passwordEncoder){
-//        this.passwordEncoder = passwordEncoder;
-//    }
 
     @Override
     public User findByUsername(String username) {
@@ -81,28 +74,34 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.findAll();
     }
 
-    // TODO vraca li User, ili prvo ide preko UserDetails ?
-
-//    @Override
-//    public User findById(Long id) {
-//        userRepository.findById(id);
-//        return null;
-//    }
-
     public User findById(Long id) {
         return this.userRepository.findById(id).orElse(null);
-//        if (foundUser.isPresent()) {
-//            return foundUser.get();
-//        }
-//        return null;
     }
 
     @Override
-    public void changeOwnData(UserDTO newData, User currentUser) {
+    public boolean changeOwnData(UserDTO newData, User currentUser) {
+        if (emailBelongsToUser(newData.getEmail(), currentUser.getEmail()) || !emailIsTaken(newData.getEmail()) )
+        {
+        currentUser.setEmail(newData.getEmail().trim());
+
         currentUser.setDisplayName(newData.getDisplayName());
         currentUser.setDescription(newData.getDescription());
         currentUser.setAvatar(newData.getAvatar());
+
         userRepository.save(currentUser);
+        return true;
+        }
+        return false;
+
+
+    }
+
+    private boolean emailBelongsToUser(String newEmail, String existingUserEmail) {
+        return existingUserEmail.equalsIgnoreCase(newEmail.trim() );
+    }
+
+    private boolean emailIsTaken(String newEmail) {
+        return userRepository.findFirstByEmail(newEmail).isPresent();
     }
 
     @Override

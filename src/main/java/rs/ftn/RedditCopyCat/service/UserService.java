@@ -16,7 +16,7 @@ public interface UserService {
 
     User findById(Long id);
 
-    void changeOwnData(UserDTO newData, User currentUserData);
+    boolean changeOwnData(UserDTO newData, User currentUserData);
 
     boolean changeOwnPassword(String oldPassword, String newPassword, User foundUser);
 

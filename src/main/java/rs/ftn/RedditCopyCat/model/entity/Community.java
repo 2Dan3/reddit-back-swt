@@ -22,8 +22,6 @@ public class Community {
     @Column(name = "community_id", nullable = false, unique = true)
     private Long id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    private Moderator moderator;
     @ManyToMany(mappedBy = "moderatedCommunities", fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH } )
     private Set<User> moderators = new HashSet<User>();
 
@@ -78,8 +76,14 @@ public class Community {
         creator.getModeratedCommunities().add(this);
     }
     public void removeModerator(User moderator) {
-        moderators.remove(moderator);
+        this.getModerators().remove(moderator);
         moderator.getModeratedCommunities().remove(this);
+    }
+    public void removeAllModerators(){
+        for ( User moderator : this.getModerators() ) {
+            moderator.getModeratedCommunities().remove(this);
+        }
+        this.getModerators().clear();
     }
     @Override
     public boolean equals(Object o) {

@@ -224,26 +224,22 @@ public class CommunityController {
     }
 
 
-    @PutMapping(value = "/{communityId}/ban")
+    @DeleteMapping(value = "/{communityId}/suspend")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityDTO> banCommunity(@RequestBody @Validated CommunityDTO communityDTO, @PathVariable Long communityId) {
+    public ResponseEntity<CommunityDTO> banCommunity(@RequestBody @Validated BanCommunityDTO communityDTO, @PathVariable Long communityId) {
 
         // community must exist
-//        TODO  findByName mozda bolje ako ne zelim ID u DTO da se mapira sa JSON ?
-//        Community community = communityService.findById(communityDTO.getId());
-        Community community = communityService.findByName(communityDTO.getName());
-
-        if (community == null) {
+        Community community = communityService.findById(communityId);
+//        Community community = communityService.findByName(communityDTO.getName());
+        if (community == null || community.isSuspended()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         community.setSuspended(true);
-        community.setSuspensionReason(communityDTO.getSuspensionReason());
-
-	// TODO*: community.removeAllModerators(); does: for User u : moderators u.getCommunities().remove(this); + this.moderators.empty or removeAll
+        community.setSuspensionReason(communityDTO.getSuspensionReason().trim() );
+	    community.removeAllModerators();
 
         community = communityService.save(community);
-	// TODO*: saveAll(community.getModerators() ); Moze li?  ?  ? Ako ne probati sa orphanRemoval u Community na polje moderators, ali onda mozda ce raditi? . . . tj. bez for petlje kao iznad. U ovom slucaju NE SME orphanRemoval brisati i iz User maticne tabele, samo iz Moderator-a.
         return new ResponseEntity(new CommunityDTO(community), HttpStatus.OK);
     }
 

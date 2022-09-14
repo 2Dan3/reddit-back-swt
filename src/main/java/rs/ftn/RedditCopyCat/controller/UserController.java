@@ -157,7 +157,9 @@ public class UserController {
         if (foundUser == null)
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
 
-        userService.changeOwnData(newData, foundUser);
+        if (userService.changeOwnData(newData, foundUser) == false)
+            return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
+
         return new ResponseEntity<>(new UserDTO(foundUser), HttpStatus.OK);
     }
 
