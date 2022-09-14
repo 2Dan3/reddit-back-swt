@@ -13,10 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import rs.ftn.RedditCopyCat.model.DTO.CommunityDTO;
-import rs.ftn.RedditCopyCat.model.DTO.JwtAuthenticationRequest;
-import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
-import rs.ftn.RedditCopyCat.model.DTO.UserTokenState;
+import rs.ftn.RedditCopyCat.model.DTO.*;
 import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.security.TokenUtils;
@@ -152,7 +149,7 @@ public class UserController {
 
     @PutMapping("/edit")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> changeOwnData(Authentication loggedUser, @Valid @RequestBody UserDTO newData) {
+    public ResponseEntity<UserDTO> changeOwnData(Authentication loggedUser, @Valid @RequestBody ChangeDataUserDTO newData) {
         User foundUser = userService.findByUsername(loggedUser.getName() );
 
         if (foundUser == null)

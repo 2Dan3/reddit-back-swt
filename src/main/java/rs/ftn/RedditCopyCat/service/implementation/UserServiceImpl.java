@@ -6,6 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import rs.ftn.RedditCopyCat.model.DTO.ChangeDataUserDTO;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
 import rs.ftn.RedditCopyCat.model.entity.Banned;
 import rs.ftn.RedditCopyCat.model.entity.Community;
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean changeOwnData(UserDTO newData, User currentUser) {
+    public boolean changeOwnData(ChangeDataUserDTO newData, User currentUser) {
         if (emailBelongsToUser(newData.getEmail(), currentUser.getEmail()) || !emailIsTaken(newData.getEmail()) )
         {
         currentUser.setEmail(newData.getEmail().trim());

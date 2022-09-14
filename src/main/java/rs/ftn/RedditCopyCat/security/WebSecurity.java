@@ -11,10 +11,7 @@ import rs.ftn.RedditCopyCat.model.entity.User;
 import rs.ftn.RedditCopyCat.service.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
 
-//** Komponenta koja moze da obavlja dodatnu proveru zahteva pre nego sto dospe na endpoint.
-//Moguce je pristupiti @PathVariable podacima sa URL-a zahteva na endpoint, poput {id}.
 //https://docs.spring.io/spring-security/site/docs/5.2.11.RELEASE/reference/html/authorization.html
 
 @Component
@@ -32,8 +29,10 @@ public class WebSecurity {
     @Autowired
     private ReportService reportService;
 
-    public boolean moderatesCommunity(Long communityId, Principal principal) {
-        User moderator = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean moderatesCommunity(Authentication authentication, HttpServletRequest request, Long communityId) {
+        if (authentication == null)
+            return false;
+        User moderator = userService.findByUsername(authentication.getName());
         if (moderator == null)
             return false;
         if (!userService.moderatesCommunity(communityId, moderator))
@@ -41,8 +40,10 @@ public class WebSecurity {
         return true;
     }
 
-    public boolean moderatesCommunity(CommunityDTO communityDTO, Principal principal) {
-        User moderator = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean moderatesCommunity(Authentication authentication, HttpServletRequest request, CommunityDTO communityDTO) {
+        if (authentication == null)
+            return false;
+        User moderator = userService.findByUsername(authentication.getName() );
         if (moderator == null)
             return false;
         if (!userService.moderatesCommunity(communityDTO.getId(), moderator))
@@ -50,36 +51,42 @@ public class WebSecurity {
         return true;
     }
 
-    public boolean isUserLogged(Principal principal) {
-        if ( (UserDetails)principal == null)
+    public boolean isUserLogged(Authentication authentication, HttpServletRequest request) {
+        if ( authentication == null)
             return false;
         return true;
     }
 
-    public boolean canChangePost(Long postId, Principal principal) {
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean canChangePost(Authentication authentication, HttpServletRequest request, Long postId) {
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName() );
         if (loggedUser == null)
             return false;
 
-        if (!canUserParttake(postId, principal) || !postService.isAuthor(postId, loggedUser.getId()))
+        if (!canUserParttake(authentication, request, postId) || !postService.isAuthor(postId, loggedUser.getId()))
             return false;
         return true;
     }
 
-    public boolean canChangeComment(Long postId, Long commentId, Principal principal) {
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean canChangeComment(Authentication authentication, HttpServletRequest request, Long postId, Long commentId) {
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName());
         if (loggedUser == null)
             return false;
 
-        if (!canUserParttake(postId, principal) || !commentService.isAuthor(commentId, loggedUser.getId()))
+        if (!canUserParttake(authentication, request, postId) || !commentService.isAuthor(commentId, loggedUser.getId()))
             return false;
         return true;
     }
 
-    public boolean canUserParttake(Long postId, Principal principal) {
+    public boolean canUserParttake(Authentication authentication, HttpServletRequest request, Long postId) {
         // This method checks that the given User is
         // authenticated & not banned from associated Community
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName());
         if (loggedUser == null)
             return false;
 
@@ -89,59 +96,67 @@ public class WebSecurity {
         return true;
     }
 
-    public boolean canChangeReaction(Long reactionId, Principal principal) {
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean canChangeReaction(Authentication authentication, HttpServletRequest request, Long reactionId) {
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName());
         if (loggedUser == null)
             return false;
 
         Post foundPost = postService.findByReactionId(reactionId);
 
-        if (foundPost == null || !canUserParttake(foundPost.getId(), principal) || !reactionService.isAuthor(reactionId, loggedUser.getId()))
+        if (foundPost == null || !canUserParttake(authentication, request, foundPost.getId()) || !reactionService.isAuthor(reactionId, loggedUser.getId()))
             return false;
         return true;
     }
 
-    public boolean canReactToPost(Principal principal, Long postId) {
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean canReactToPost(Authentication authentication, HttpServletRequest request, Long postId) {
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName());
 
         if (loggedUser == null || reactionService.existsForPost(postId, loggedUser) ||
-                !canUserParttake(postId, principal) )
+                !canUserParttake(authentication, request, postId) )
         {
             return false;
         }
         return true;
     }
 
-    public boolean canReactToComment(Principal principal, Long commentId) {
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean canReactToComment(Authentication authentication, HttpServletRequest request, Long commentId) {
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName());
         Post foundPost = postService.findByCommentId(commentId);
 
         if (foundPost == null || loggedUser == null ||
                 reactionService.existsForComment(commentId, loggedUser) ||
-                !canUserParttake(foundPost.getId(), principal) )
+                !canUserParttake(authentication, request, foundPost.getId()) )
         {
             return false;
         }
         return true;
     }
 
-    public boolean canReportPost(Principal principal, Long postId) {
-        if (!canUserParttake(postId, principal)) {
+    public boolean canReportPost(Authentication authentication, HttpServletRequest request, Long postId) {
+        if (!canUserParttake(authentication, request, postId)) {
             return false;
         }
         return true;
     }
 
-    public boolean canReportComment(Principal principal, Long commentId) {
+    public boolean canReportComment(Authentication authentication, HttpServletRequest request, Long commentId) {
         Post associatedPost = postService.findByCommentId(commentId);
-        if (associatedPost == null || !canUserParttake(associatedPost.getId(), principal)) {
+        if (associatedPost == null || !canUserParttake(authentication, request, associatedPost.getId()) ) {
             return false;
         }
         return true;
     }
 
-    public boolean canChangeReport(Principal principal, Long reportId) {
-        User loggedUser = userService.findByUsername( ((UserDetails)principal).getUsername());
+    public boolean canChangeReport(Authentication authentication, HttpServletRequest request, Long reportId) {
+        if (authentication == null)
+            return false;
+        User loggedUser = userService.findByUsername(authentication.getName());
         if (loggedUser == null)
             return false;
 
@@ -153,12 +168,12 @@ public class WebSecurity {
             associatedPost = targetedReport.getForPost();
         }
 
-        if (!canUserParttake(associatedPost.getId(), principal) || !reportService.isAuthor(reportId, loggedUser.getId()))
+        if (!canUserParttake(authentication, request, associatedPost.getId()) || !reportService.isAuthor(reportId, loggedUser.getId()))
             return false;
         return true;
     }
 
-    public boolean canAcceptReports(Principal principal, Long reportId) {
+    public boolean canAcceptReports(Authentication authentication, HttpServletRequest request, Long reportId) {
 
         Report targetedReport = reportService.findById(reportId);
         Post associatedPost;
@@ -169,6 +184,6 @@ public class WebSecurity {
             associatedPost = targetedReport.getForPost();
         }
 
-        return moderatesCommunity(associatedPost.getCommunity().getId(), principal);
+        return moderatesCommunity(authentication, request, associatedPost.getCommunity().getId());
     }
 }

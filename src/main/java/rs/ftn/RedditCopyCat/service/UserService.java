@@ -1,5 +1,6 @@
 package rs.ftn.RedditCopyCat.service;
 
+import rs.ftn.RedditCopyCat.model.DTO.ChangeDataUserDTO;
 import rs.ftn.RedditCopyCat.model.DTO.UserDTO;
 import rs.ftn.RedditCopyCat.model.entity.Community;
 import rs.ftn.RedditCopyCat.model.entity.User;
@@ -16,7 +17,7 @@ public interface UserService {
 
     User findById(Long id);
 
-    boolean changeOwnData(UserDTO newData, User currentUserData);
+    boolean changeOwnData(ChangeDataUserDTO newData, User currentUserData);
 
     boolean changeOwnPassword(String oldPassword, String newPassword, User foundUser);
 
