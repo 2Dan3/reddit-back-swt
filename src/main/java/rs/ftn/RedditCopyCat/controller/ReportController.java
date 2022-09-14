@@ -6,12 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.ReportDTO;
 import rs.ftn.RedditCopyCat.model.entity.*;
 import rs.ftn.RedditCopyCat.service.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class ReportController {
 
     @PostMapping(consumes = "application/json", value = "/posts/{postId}/reports")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReportDTO> makeReportToPost(Authentication authentication, @PathVariable Long postId, @RequestBody @Validated ReportDTO receivedReport) {
+    public ResponseEntity<ReportDTO> makeReportToPost(Authentication authentication, @PathVariable Long postId, @Valid @RequestBody ReportDTO receivedReport) {
         Post foundPost = postService.findById(postId);
         if (foundPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -77,7 +77,7 @@ public class ReportController {
 
     @PostMapping(consumes = "application/json", value = "/comments/{commentId}/reports")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReportDTO> makeReportToComment(Authentication authentication, @PathVariable Long commentId, @RequestBody @Validated ReportDTO receivedReport) {
+    public ResponseEntity<ReportDTO> makeReportToComment(Authentication authentication, @PathVariable Long commentId, @Valid @RequestBody ReportDTO receivedReport) {
         Comment foundComment = commentService.findById(commentId);
         if (foundComment == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -97,7 +97,7 @@ public class ReportController {
 
     @PutMapping(value = "/reports/{reportId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReportDTO> editOwnReport(@PathVariable Long reportId, @RequestBody @Validated ReportDTO receivedReport) {
+    public ResponseEntity<ReportDTO> editOwnReport(@PathVariable Long reportId, @Valid @RequestBody ReportDTO receivedReport) {
         Report existingReport = reportService.findById(reportId);
         if (existingReport == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

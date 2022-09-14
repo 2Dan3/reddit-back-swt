@@ -65,9 +65,10 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
                 System.out.println("\n\n---------------------\nNot Valid Token");
             }
 
-        } else {
-            System.out.println("\n\n---------------------\nNo Token");
         }
+//        else {
+//            System.out.println("\n\n---------------------\nNo Token");
+//        }
 //-------------------------------------------------------------------------
 
         chain.doFilter(request, response);

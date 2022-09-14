@@ -5,8 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.ReactionDTO;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
@@ -18,7 +16,7 @@ import rs.ftn.RedditCopyCat.service.PostService;
 import rs.ftn.RedditCopyCat.service.ReactionService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
-import java.security.Principal;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +128,7 @@ public class ReactionController {
     @PostMapping(consumes = "application/json",
                 value = "/posts/{postId}/reactions")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> reactToPost(Authentication authentication, @PathVariable Long postId, @RequestBody @Validated ReactionDTO receivedReaction) {
+    public ResponseEntity<ReactionDTO> reactToPost(Authentication authentication, @PathVariable Long postId, @Valid @RequestBody ReactionDTO receivedReaction) {
 
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null)
@@ -160,7 +158,7 @@ public class ReactionController {
 
     @PostMapping(consumes = "application/json", value = "/comments/{commentId}/reactions")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<ReactionDTO> reactToComment(Authentication authentication, @PathVariable Long commentId, @RequestBody @Validated ReactionDTO receivedReaction) {
+    public ResponseEntity<ReactionDTO> reactToComment(Authentication authentication, @PathVariable Long commentId, @Valid @RequestBody ReactionDTO receivedReaction) {
 
         Comment targetedComment = commentService.findById(commentId);
         if (targetedComment == null)

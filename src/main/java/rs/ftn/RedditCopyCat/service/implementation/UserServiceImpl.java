@@ -52,12 +52,12 @@ public class UserServiceImpl implements UserService {
         }
 
         User newUser = new User();
-        newUser.setEmail(userDTO.getEmail());
-        newUser.setUsername(userDTO.getUsername());
+        newUser.setEmail(userDTO.getEmail().trim() );
+        newUser.setUsername(userDTO.getUsername().trim() );
         newUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         newUser.setRole(Roles.USER);
         newUser.setRegistrationDate(LocalDate.now());
-        newUser.setDisplayName(newUser.getUsername());
+        newUser.setDisplayName(newUser.getUsername().trim() );
 
         newUser = userRepository.save(newUser);
 

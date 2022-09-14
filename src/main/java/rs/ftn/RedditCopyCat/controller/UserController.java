@@ -25,6 +25,7 @@ import rs.ftn.RedditCopyCat.service.UserService;
 import rs.ftn.RedditCopyCat.service.implementation.UserServiceImpl;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -52,7 +53,7 @@ public class UserController {
     }
 
     @PostMapping(consumes = "application/json", value = "/")
-    public ResponseEntity<UserDTO> registerNewUser(@RequestBody  @Validated UserDTO newUser){
+    public ResponseEntity<UserDTO> registerNewUser(@Valid @RequestBody UserDTO newUser){
 
         User createdUser = userService.createUser(newUser);
 
@@ -67,7 +68,7 @@ public class UserController {
 //    @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping(consumes = "application/json", value = "/login")
     public ResponseEntity<UserTokenState> createAuthenticationToken(
-            @RequestBody @Validated JwtAuthenticationRequest authRequest, HttpServletResponse response) {
+            @Valid @RequestBody JwtAuthenticationRequest authRequest, HttpServletResponse response) {
         System.out.println("\n------------\nENTERED LOGIN\n------------\n");
 
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -151,7 +152,7 @@ public class UserController {
 
     @PutMapping("/edit")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<UserDTO> changeOwnData(Authentication loggedUser, @RequestBody @Validated UserDTO newData) {
+    public ResponseEntity<UserDTO> changeOwnData(Authentication loggedUser, @Valid @RequestBody UserDTO newData) {
         User foundUser = userService.findByUsername(loggedUser.getName() );
 
         if (foundUser == null)

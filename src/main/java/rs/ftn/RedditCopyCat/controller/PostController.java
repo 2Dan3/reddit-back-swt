@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.support.ServletContextResource;
 import rs.ftn.RedditCopyCat.model.DTO.CommentDTO;
@@ -21,6 +19,7 @@ import rs.ftn.RedditCopyCat.service.ReactionService;
 import rs.ftn.RedditCopyCat.service.UserService;
 
 import javax.servlet.ServletContext;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public class PostController {
 
     @PostMapping(consumes = "application/json", value = "/{postId}/comments/{parentId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommentDTO> makeComment(Authentication authentication, @PathVariable Long postId, @RequestBody @Validated CommentDTO receivedComment, @PathVariable Long parentId) {
+    public ResponseEntity<CommentDTO> makeComment(Authentication authentication, @PathVariable Long postId, @Valid @RequestBody CommentDTO receivedComment, @PathVariable Long parentId) {
         Post targetedPost = postService.findById(postId);
         if (targetedPost == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -99,7 +98,7 @@ public class PostController {
 
     @PutMapping("/{postId}/comments/{commentId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommentDTO> editOwnComment(@PathVariable Long postId, @PathVariable Long commentId, @RequestBody @Validated CommentDTO receivedComment) {
+    public ResponseEntity<CommentDTO> editOwnComment(@PathVariable Long postId, @PathVariable Long commentId, @Valid @RequestBody CommentDTO receivedComment) {
 
         Comment targetComment = commentService.findById(commentId);
         if (postService.findById(postId) == null || targetComment == null)

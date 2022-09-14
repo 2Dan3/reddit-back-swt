@@ -6,13 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rs.ftn.RedditCopyCat.model.DTO.*;
 import rs.ftn.RedditCopyCat.model.entity.*;
 import rs.ftn.RedditCopyCat.model.enums.ReactionType;
 import rs.ftn.RedditCopyCat.service.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class CommunityController {
 
     @PostMapping(consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommunityDTO> createCommunity(Authentication authentication, @RequestBody @Validated CreateCommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> createCommunity(Authentication authentication, @Valid @RequestBody CreateCommunityDTO communityDTO) {
 
         if (communityService.findByName(communityDTO.getName()) != null) {
             return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
@@ -86,7 +86,7 @@ public class CommunityController {
 
     @PutMapping(consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommunityDTO> updateCommunity(@RequestBody @Validated CommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> updateCommunity(@Valid @RequestBody CommunityDTO communityDTO) {
 
         // community must exist
         Community community = communityService.findById(communityDTO.getId());
@@ -157,7 +157,7 @@ public class CommunityController {
 
     @PostMapping(consumes = "application/json", value = "/{communityId}/posts")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<PostDTO> createPost(Authentication authentication, @PathVariable Long communityId, @RequestBody @Validated PostDTO postSent) {
+    public ResponseEntity<PostDTO> createPost(Authentication authentication, @PathVariable Long communityId, @Valid @RequestBody PostDTO postSent) {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
@@ -183,7 +183,7 @@ public class CommunityController {
 
     @PutMapping(value = "/{communityId}/posts/{postId}")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Void> updatePost(@PathVariable Long communityId, @RequestBody @Validated PostDTO postSent, @PathVariable Long postId) {
+    public ResponseEntity<Void> updatePost(@PathVariable Long communityId, @Valid @RequestBody PostDTO postSent, @PathVariable Long postId) {
 
         Community community = communityService.findOneWithPosts(communityId);
         if (community == null) {
@@ -226,7 +226,7 @@ public class CommunityController {
 
     @DeleteMapping(value = "/{communityId}/suspend")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CommunityDTO> banCommunity(@RequestBody @Validated BanCommunityDTO communityDTO, @PathVariable Long communityId) {
+    public ResponseEntity<CommunityDTO> banCommunity(@Valid @RequestBody BanCommunityDTO communityDTO, @PathVariable Long communityId) {
 
         // community must exist
         Community community = communityService.findById(communityId);
@@ -259,7 +259,7 @@ public class CommunityController {
 
     @PutMapping(value = "/{communityId}/posts/{postId}/flair")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<Void> setFlairForPost(@RequestBody @Validated FlairDTO flairDTO, @PathVariable Long communityId, @PathVariable Long postId) {
+    public ResponseEntity<Void> setFlairForPost(@Valid @RequestBody FlairDTO flairDTO, @PathVariable Long communityId, @PathVariable Long postId) {
 //        find by ID only, no join fetch needed since flair field is EAGERLY loaded in Post
         Post containingPost = postService.findById(postId);
         if (containingPost == null)
