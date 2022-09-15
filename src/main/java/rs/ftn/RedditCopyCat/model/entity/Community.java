@@ -84,6 +84,8 @@ public class Community {
             moderator.getModeratedCommunities().remove(this);
         }
         this.getModerators().clear();
+        this.setModerators(new HashSet<>());
+
     }
     @Override
     public boolean equals(Object o) {

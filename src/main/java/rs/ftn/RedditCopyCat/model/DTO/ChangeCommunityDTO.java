@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class ChangeCommunityDTO {
     private Long id;
+//    @NotBlank
     private String name;
     @NotBlank(message = "Description must be provided!")
     private  String description;
