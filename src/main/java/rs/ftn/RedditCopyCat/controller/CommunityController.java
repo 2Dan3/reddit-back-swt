@@ -84,18 +84,19 @@ public class CommunityController {
         return new ResponseEntity<>(new CommunityDTO(community), HttpStatus.CREATED);
     }
 
-    @PutMapping(consumes = "application/json")
+    @PutMapping(value = "/{communityId}", consumes = "application/json")
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
-    public ResponseEntity<CommunityDTO> updateCommunity(@Valid @RequestBody CommunityDTO communityDTO) {
+    public ResponseEntity<CommunityDTO> updateCommunity(@Valid @RequestBody ChangeCommunityDTO communityDTO, @PathVariable Long communityId) {
 
         // community must exist
-        Community community = communityService.findById(communityDTO.getId());
+        Community community = communityService.findById(communityId);
 
         if (community == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        community.setName(communityDTO.getName());
+//      NAME CANNOT BE CHANGED, IT IS UNIQUE IDENTIFIER OF ONE'S COMMUNITY
+//      community.setName(communityDTO.getName());
         community.setDescription(communityDTO.getDescription());
 
         community = communityService.save(community);

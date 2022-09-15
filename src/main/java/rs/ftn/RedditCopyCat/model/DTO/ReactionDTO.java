@@ -19,13 +19,13 @@ import java.time.LocalDate;
 public class ReactionDTO {
     private Long id;
     @NotBlank(message = "Reaction type required!")
-    private ReactionType type;
+    private String type;
     private LocalDate timestamp;
     private Long authorId;
 
     public ReactionDTO(Reaction r) {
         this.id = r.getId();
-        this.type = r.getType();
+        this.type = r.getType().toString();
         this.timestamp = r.getTimestamp();
         this.authorId = r.getMadeBy().getId();
     }

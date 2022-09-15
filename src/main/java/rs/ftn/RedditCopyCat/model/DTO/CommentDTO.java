@@ -3,11 +3,9 @@ package rs.ftn.RedditCopyCat.model.DTO;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.model.entity.User;
-import rs.ftn.RedditCopyCat.service.ReactionService;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
@@ -16,9 +14,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class CommentDTO {
-
-    @Autowired
-    private ReactionService reactionService;
 
     private Long id;
     @NotBlank

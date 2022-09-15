@@ -11,6 +11,7 @@ import rs.ftn.RedditCopyCat.model.entity.Comment;
 import rs.ftn.RedditCopyCat.model.entity.Post;
 import rs.ftn.RedditCopyCat.model.entity.Reaction;
 import rs.ftn.RedditCopyCat.model.entity.User;
+import rs.ftn.RedditCopyCat.model.enums.ReactionType;
 import rs.ftn.RedditCopyCat.service.CommentService;
 import rs.ftn.RedditCopyCat.service.PostService;
 import rs.ftn.RedditCopyCat.service.ReactionService;
@@ -139,7 +140,7 @@ public class ReactionController {
         Reaction existingReaction = reactionService.findForPostByUser(postId, currentUser.getId());
         if (existingReaction == null) {
             Reaction newReaction = new Reaction();
-            newReaction.setType(receivedReaction.getType());
+            newReaction.setType(ReactionType.valueOf(receivedReaction.getType()));
             newReaction.setToPost(targetedPost);
             newReaction.setMadeBy(currentUser);
             newReaction.setTimestamp(LocalDate.now());
@@ -147,10 +148,10 @@ public class ReactionController {
             newReaction = reactionService.save(newReaction);
             return new ResponseEntity<>(new ReactionDTO(newReaction), HttpStatus.CREATED);
         }else {
-            if (existingReaction.getType() == receivedReaction.getType())
+            if (existingReaction.getType().toString().equalsIgnoreCase(receivedReaction.getType()))
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
-            existingReaction.setType(receivedReaction.getType());
+            existingReaction.setType(ReactionType.valueOf(receivedReaction.getType()));
             existingReaction = reactionService.save(existingReaction);
             return new ResponseEntity<>(new ReactionDTO(existingReaction), HttpStatus.CREATED);
         }
@@ -169,7 +170,7 @@ public class ReactionController {
         Reaction existingReaction = reactionService.findForCommentByUser(commentId, currentUser.getId());
         if (existingReaction == null) {
             Reaction newReaction = new Reaction();
-            newReaction.setType(receivedReaction.getType());
+            newReaction.setType(ReactionType.valueOf(receivedReaction.getType()));
             newReaction.setToComment(targetedComment);
             newReaction.setMadeBy(currentUser);
             newReaction.setTimestamp(LocalDate.now());
@@ -177,10 +178,10 @@ public class ReactionController {
             newReaction = reactionService.save(newReaction);
             return new ResponseEntity<>(new ReactionDTO(newReaction), HttpStatus.CREATED);
         } else {
-            if (existingReaction.getType() == receivedReaction.getType())
+            if (existingReaction.getType().toString().equalsIgnoreCase(receivedReaction.getType()))
                 return new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 
-            existingReaction.setType(receivedReaction.getType());
+            existingReaction.setType(ReactionType.valueOf(receivedReaction.getType()));
             existingReaction = reactionService.save(existingReaction);
             return new ResponseEntity<>(new ReactionDTO(existingReaction), HttpStatus.CREATED);
         }

@@ -76,7 +76,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 /*                .antMatchers(HttpMethod.POST, "reddit/users/logout").access("@webSecurity.isUserLogged(authentication, request)")*/
                 .antMatchers(HttpMethod.GET, "/reddit/communities").permitAll()
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{id}").permitAll()
-                .antMatchers(HttpMethod.PUT, "/reddit/communities").access("@webSecurity.moderatesCommunity(authentication, request, #communityDTO)")
+                .antMatchers(HttpMethod.PUT, "/reddit/communities").access("@webSecurity.moderatesCommunity(authentication, request, #communityId)")
 //                .antMatchers(HttpMethod.DELETE, "/reddit/communities/{communityId}").access("@webSecurity.moderatesCommunity(authentication, request, #communityId)")
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts").permitAll()
                 .antMatchers(HttpMethod.GET, "/reddit/communities/{communityId}/posts/{postId}").permitAll()

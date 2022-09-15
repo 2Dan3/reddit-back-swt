@@ -80,8 +80,11 @@ public class CommentServiceImpl implements CommentService {
 
         if (parentId != null) {
             Comment parentComment = findById(parentId);
-            if (parentComment != null && !parentComment.isDeleted())
+            if (parentComment != null && !parentComment.isDeleted()) {
+                if (parentComment.getBelongsToPost().getId() != targetedPost.getId())
+                    return null;
                 madeComment.setParentComment(parentComment);
+            }
         }
 
         madeComment.setDeleted(false);

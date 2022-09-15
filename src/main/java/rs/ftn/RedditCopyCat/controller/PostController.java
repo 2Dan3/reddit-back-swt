@@ -92,6 +92,9 @@ public class PostController {
         User creator = userService.findByUsername(authentication.getName() );
 
         Comment madeComment = commentService.attachComment(creator, targetedPost, parentId, receivedComment.getText());
+        if (madeComment == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
         reactionService.save(new Reaction(ReactionType.UPVOTE, null, madeComment, creator));
         return new ResponseEntity<>(new CommentDTO(madeComment, reactionService.getKarmaForComment(madeComment.getId())), HttpStatus.CREATED);
     }
